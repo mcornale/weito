@@ -124,7 +124,15 @@
 					</div>
 					<InputLabel>
 						reps
-						<Input type="number" inputmode="numeric" class="set-log-input" bind:value={set.reps} />
+						<Input
+							type="number"
+							inputmode="numeric"
+							class="set-log-input"
+							bind:value={set.reps}
+							{@attach (node) => {
+								node.focus();
+							}}
+						/>
 					</InputLabel>
 					<InputLabel>
 						kg

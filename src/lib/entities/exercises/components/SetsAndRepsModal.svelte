@@ -58,9 +58,12 @@
 							placeholder="3"
 							inputmode="numeric"
 							name="sets-{variation.id}"
-							bind:value={variation.sets}
 							type="number"
 							class="sets-input"
+							bind:value={variation.sets}
+							{@attach (node) => {
+								node.focus();
+							}}
 						/>
 					</InputLabel>
 					<InputLabel>

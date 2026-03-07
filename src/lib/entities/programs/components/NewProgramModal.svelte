@@ -99,6 +99,9 @@
 							: 'Routine name'}
 						name="routine-name"
 						bind:value={routine.name}
+						{@attach (node) => {
+							node.focus();
+						}}
 					/>
 					<Button
 						variant="secondary"
