@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "weito-staging",
+    "production": "weito-8bd79"
+  },
+  "targets": {},
+  "etags": {}
+}

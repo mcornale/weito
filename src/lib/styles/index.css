@@ -1,0 +1,3 @@
+@layer normalize, base, components;
+@import './normalize.css' layer(normalize);
+@import './base.css' layer(base);
