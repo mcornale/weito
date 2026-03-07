@@ -86,7 +86,6 @@
 		max-width: 100vw;
 		width: 100vw;
 		border-radius: 2rem 2rem 0 0;
-		z-index: 1000;
 
 		transition:
 			opacity 0.15s var(--ease-quad-out),

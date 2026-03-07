@@ -3,6 +3,7 @@
 	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 
 	import Button from '$lib/components/ui/Button.svelte';
+	import { getNotifierContext } from '$lib/features/notifier/context';
 
 	import { createExercise } from '../mutations';
 	import { getExercisesQueryOptions } from '../queries';
@@ -19,6 +20,8 @@
 
 	let isOpen = $state(false);
 
+	const { notifyError } = getNotifierContext();
+
 	const queryClient = useQueryClient();
 	const createExerciseMutation = createMutation(() => ({
 		mutationFn: createExercise,
@@ -27,9 +30,10 @@
 				getExercisesQueryOptions({ programId, routineId }).queryKey,
 				(data) => [...(data ?? []), createdExercise]
 			);
-		},
-		onSettled: () => {
 			isOpen = false;
+		},
+		onError: () => {
+			notifyError(`Couldn't add exercise. Please try again.`);
 		}
 	}));
 </script>

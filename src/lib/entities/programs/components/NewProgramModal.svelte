@@ -9,6 +9,7 @@
 	import Input from '$lib/components/ui/Input.svelte';
 	import { createProgram } from '$lib/entities/programs/mutations';
 	import { getProgramsQueryOptions } from '$lib/entities/programs/queries';
+	import { getNotifierContext } from '$lib/features/notifier/context';
 	import { listItemSlideIn, listItemSlideOut } from '$lib/transitions';
 
 	import type { Program } from '../types';
@@ -41,6 +42,8 @@
 		nextRoutineId++;
 	}
 
+	const { notifyError } = getNotifierContext();
+
 	const queryClient = useQueryClient();
 	const createProgramMutation = createMutation(() => ({
 		mutationFn: createProgram,
@@ -50,10 +53,11 @@
 				...(data ?? [])
 			]);
 			goto(resolve('/(app)/[routineId]', { routineId: createdProgram.routines[0].id }));
-		},
-		onSettled: () => {
 			isOpen = false;
 			resetForm();
+		},
+		onError: () => {
+			notifyError(`Couldn't create program. Please try again.`);
 		}
 	}));
 

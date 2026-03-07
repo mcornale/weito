@@ -6,6 +6,7 @@
 	import Input from '$lib/components/ui/Input.svelte';
 	import { updateProgram } from '$lib/entities/programs/mutations';
 	import { getProgramsQueryOptions } from '$lib/entities/programs/queries';
+	import { getNotifierContext } from '$lib/features/notifier/context';
 
 	import type { Program } from '../types';
 
@@ -17,6 +18,8 @@
 	let { program, isOpen = $bindable() }: Props = $props();
 
 	let name = $state('');
+
+	const { notifyError } = getNotifierContext();
 
 	const queryClient = useQueryClient();
 	const updateProgramMutation = createMutation(() => ({
@@ -31,9 +34,10 @@
 				invariant(data, 'Programs data should be in the query cache');
 				return data.map((p) => (p.id === program.id ? updatedProgram : p));
 			});
-		},
-		onSettled: () => {
 			isOpen = false;
+		},
+		onError: () => {
+			notifyError(`Couldn't rename program. Please try again.`);
 		}
 	}));
 

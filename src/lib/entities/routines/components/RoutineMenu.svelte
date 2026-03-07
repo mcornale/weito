@@ -8,6 +8,7 @@
 	import { getProgramsQueryOptions } from '$lib/entities/programs/queries';
 	import type { Program } from '$lib/entities/programs/types';
 	import { swapRoutineOrder } from '$lib/entities/routines/mutations';
+	import { getNotifierContext } from '$lib/features/notifier/context';
 
 	import type { Routine } from '../types';
 	import RenameRoutineModal from './RenameRoutineModal.svelte';
@@ -48,6 +49,8 @@
 	let isRenameRoutineModalOpen = $state(false);
 	let pendingDirection = $state<-1 | 1 | null>(null);
 
+	const { notifyError } = getNotifierContext();
+
 	const queryClient = useQueryClient();
 
 	const swapOrderMutation = createMutation(() => ({
@@ -57,9 +60,12 @@
 				invariant(data, 'Programs data should be in the query cache');
 				return applyRoutineOrderSwap(data, program.id, payload);
 			});
+			menu?.close();
+		},
+		onError: () => {
+			notifyError(`Couldn't move routine. Please try again.`);
 		},
 		onSettled: () => {
-			menu?.close();
 			pendingDirection = null;
 		}
 	}));

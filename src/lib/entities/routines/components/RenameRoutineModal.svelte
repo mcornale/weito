@@ -7,6 +7,7 @@
 	import { getProgramsQueryOptions } from '$lib/entities/programs/queries';
 	import { updateRoutine } from '$lib/entities/routines/mutations';
 	import type { Routine } from '$lib/entities/routines/types';
+	import { getNotifierContext } from '$lib/features/notifier/context';
 
 	type Props = {
 		routine: Routine;
@@ -16,6 +17,8 @@
 	let { routine, isOpen = $bindable() }: Props = $props();
 
 	let name = $state('');
+
+	const { notifyError } = getNotifierContext();
 
 	const queryClient = useQueryClient();
 	const updateRoutineMutation = createMutation(() => ({
@@ -37,9 +40,10 @@
 						: p
 				);
 			});
-		},
-		onSettled: () => {
 			isOpen = false;
+		},
+		onError: () => {
+			notifyError(`Couldn't rename routine. Please try again.`);
 		}
 	}));
 

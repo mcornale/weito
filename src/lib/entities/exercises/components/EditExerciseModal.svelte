@@ -2,6 +2,8 @@
 	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 	import invariant from 'tiny-invariant';
 
+	import { getNotifierContext } from '$lib/features/notifier/context';
+
 	import { updateExercise } from '../mutations';
 	import { getExercisesQueryOptions } from '../queries';
 	import type { Exercise } from '../types';
@@ -22,6 +24,8 @@
 		restTime: exercise.restTime
 	});
 
+	const { notifyError } = getNotifierContext();
+
 	const queryClient = useQueryClient();
 	const updateExerciseMutation = createMutation(() => ({
 		mutationFn: updateExercise,
@@ -40,9 +44,10 @@
 					return data.map((e) => (e.id === exercise.id ? updatedExercise : e));
 				}
 			);
-		},
-		onSettled: () => {
 			isOpen = false;
+		},
+		onError: () => {
+			notifyError(`Couldn't edit exercise. Please try again.`);
 		}
 	}));
 </script>

@@ -20,6 +20,7 @@
 	import type { LogSet } from '$lib/entities/logs/types';
 	import type { Program } from '$lib/entities/programs/types';
 	import type { Routine } from '$lib/entities/routines/types';
+	import { getNotifierContext } from '$lib/features/notifier/context';
 	import { listItemSlideIn, listItemSlideOut } from '$lib/transitions';
 
 	type Props = {
@@ -54,6 +55,8 @@
 
 	const queryClient = useQueryClient();
 
+	const { notifyError } = getNotifierContext();
+
 	const createLogMutation = createMutation(() => ({
 		mutationFn: createLog,
 		onSuccess: (createdLog) => {
@@ -61,10 +64,11 @@
 				getLogsQueryOptions({ programId, routineId, exerciseId }).queryKey,
 				(data) => [createdLog, ...(data ?? [])]
 			);
-		},
-		onSettled: () => {
 			isOpen = false;
 			resetForm();
+		},
+		onError: () => {
+			notifyError(`Couldn't log sets. Please try again.`);
 		}
 	}));
 

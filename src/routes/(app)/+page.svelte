@@ -33,7 +33,7 @@
 			padding: 4rem;
 		}
 
-		@media (width >= 768px) {
+		@media (width >= 720px) {
 			padding-block: 8rem;
 		}
 	}

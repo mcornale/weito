@@ -9,6 +9,7 @@
 	import { getExercisesQueryOptions } from '$lib/entities/exercises/queries';
 	import type { Program } from '$lib/entities/programs/types';
 	import type { Routine } from '$lib/entities/routines/types';
+	import { getNotifierContext } from '$lib/features/notifier/context';
 
 	import type { Exercise } from '../types';
 	import EditExerciseModal from './EditExerciseModal.svelte';
@@ -45,6 +46,8 @@
 	let isRemoveExerciseModalOpen = $state(false);
 	let pendingDirection = $state<-1 | 1 | null>(null);
 
+	const { notifyError } = getNotifierContext();
+
 	const queryClient = useQueryClient();
 
 	const swapExerciseOrderMutation = createMutation(() => ({
@@ -59,9 +62,12 @@
 				invariant(data, 'Exercises data should be in the query cache');
 				return applyExerciseOrderSwap(data, payload);
 			});
+			menu?.close();
+		},
+		onError: () => {
+			notifyError(`Couldn't move exercise. Please try again.`);
 		},
 		onSettled: () => {
-			menu?.close();
 			pendingDirection = null;
 		}
 	}));
@@ -116,4 +122,10 @@
 </Menu>
 
 <EditExerciseModal bind:isOpen={isEditExerciseModalOpen} {exercise} {programId} {routineId} />
-<RemoveExerciseModal bind:isOpen={isRemoveExerciseModalOpen} {exercise} {programId} {routineId} />
+<RemoveExerciseModal
+	bind:isOpen={isRemoveExerciseModalOpen}
+	{exercise}
+	{exercises}
+	{programId}
+	{routineId}
+/>

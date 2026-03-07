@@ -6,6 +6,7 @@
 	import FormModal from '$lib/components/FormModal.svelte';
 	import { deleteProgram } from '$lib/entities/programs/mutations';
 	import { getProgramsQueryOptions } from '$lib/entities/programs/queries';
+	import { getNotifierContext } from '$lib/features/notifier/context';
 
 	import type { Program } from '../types';
 
@@ -15,6 +16,8 @@
 	};
 
 	let { program, isOpen = $bindable() }: Props = $props();
+
+	const { notifyError } = getNotifierContext();
 
 	const queryClient = useQueryClient();
 	const deleteProgramMutation = createMutation(() => ({
@@ -34,9 +37,10 @@
 
 				goto(resolve('/(app)/[routineId]', { routineId: nextRoutineId }));
 			}
-		},
-		onSettled: () => {
 			isOpen = false;
+		},
+		onError: () => {
+			notifyError(`Couldn't delete program. Please try again.`);
 		}
 	}));
 </script>
