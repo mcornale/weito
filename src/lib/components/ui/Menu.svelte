@@ -41,7 +41,7 @@
 
 		margin: 0;
 		inset: auto;
-		left: anchor(left);
+		right: anchor(right);
 		top: anchor(bottom);
 		position-try-fallbacks: flip-block, flip-inline;
 
