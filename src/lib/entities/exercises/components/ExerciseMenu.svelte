@@ -122,10 +122,4 @@
 </Menu>
 
 <EditExerciseModal bind:isOpen={isEditExerciseModalOpen} {exercise} {programId} {routineId} />
-<RemoveExerciseModal
-	bind:isOpen={isRemoveExerciseModalOpen}
-	{exercise}
-	{exercises}
-	{programId}
-	{routineId}
-/>
+<RemoveExerciseModal bind:isOpen={isRemoveExerciseModalOpen} {exercise} {programId} {routineId} />

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
+	import invariant from 'tiny-invariant';
 
 	import FormModal from '$lib/components/FormModal.svelte';
 	import { deleteExercise } from '$lib/entities/exercises/mutations';
@@ -12,13 +13,12 @@
 
 	type Props = {
 		exercise: Exercise;
-		exercises: Exercise[];
 		programId: Program['id'];
 		routineId: Routine['id'];
 		isOpen: boolean;
 	};
 
-	let { exercise, exercises, programId, routineId, isOpen = $bindable() }: Props = $props();
+	let { exercise, programId, routineId, isOpen = $bindable() }: Props = $props();
 
 	const { notifyError } = getNotifierContext();
 
@@ -26,11 +26,11 @@
 	const deleteExerciseMutation = createMutation(() => ({
 		mutationFn: deleteExercise,
 		onSuccess: (_, payload) => {
-			const filteredExercises = exercises.filter((e) => e.id !== payload.id);
-			queryClient.setQueryData(
-				getExercisesQueryOptions({ programId, routineId }).queryKey,
-				filteredExercises
-			);
+			const exercisesQueryKey = getExercisesQueryOptions({ programId, routineId }).queryKey;
+			const exercisesData = queryClient.getQueryData(exercisesQueryKey);
+			invariant(exercisesData, 'Exercises data should be in the query cache');
+			const filteredExercisesData = exercisesData.filter((e) => e.id !== payload.id);
+			queryClient.setQueryData(exercisesQueryKey, filteredExercisesData);
 			isOpen = false;
 		},
 		onError: () => {

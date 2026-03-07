@@ -23,9 +23,10 @@
 	const deleteProgramMutation = createMutation(() => ({
 		mutationFn: deleteProgram,
 		onSuccess: () => {
-			const programsData = queryClient.getQueryData(getProgramsQueryOptions().queryKey);
+			const programsQueryKey = getProgramsQueryOptions().queryKey;
+			const programsData = queryClient.getQueryData(programsQueryKey);
 			const filteredProgramsData = (programsData ?? []).filter((p) => p.id !== program.id);
-			queryClient.setQueryData(getProgramsQueryOptions().queryKey, filteredProgramsData);
+			queryClient.setQueryData(programsQueryKey, filteredProgramsData);
 			const lastVisitedRoutineId = localStorage.getItem('last-visited-routine-id');
 
 			if (filteredProgramsData.length === 0) {
