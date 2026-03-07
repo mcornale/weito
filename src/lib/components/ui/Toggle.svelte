@@ -7,19 +7,14 @@
 		disabled?: boolean;
 	};
 
-	let {
-		label,
-		checked: isChecked = $bindable(false),
-		disabled: isDisabled = false,
-		...props
-	}: Props = $props();
+	let { label, checked = $bindable(false), disabled = false, ...props }: Props = $props();
 </script>
 
 <label class="toggle" {...props}>
 	{label}
 	<div class="toggle-control">
 		<span class="toggle-inner" aria-hidden="true"></span>
-		<input type="checkbox" class="sr-only" bind:checked={isChecked} disabled={isDisabled} />
+		<input type="checkbox" class="sr-only" bind:checked {disabled} />
 	</div>
 </label>
 

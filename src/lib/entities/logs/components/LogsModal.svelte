@@ -4,6 +4,7 @@
 
 	import Button from '$lib/components/ui/Button.svelte';
 	import Modal from '$lib/components/ui/Modal.svelte';
+	import Toggle from '$lib/components/ui/Toggle.svelte';
 	import ExerciseItem from '$lib/entities/exercises/components/ExerciseItem.svelte';
 	import type { Exercise } from '$lib/entities/exercises/types';
 	import { getLogsQueryOptions } from '$lib/entities/logs/queries';
@@ -12,6 +13,7 @@
 	import { capitalize } from '$lib/utils';
 
 	import LogSetsModal from './LogSetsModal.svelte';
+	import VolumeChart from './VolumeChart.svelte';
 
 	type Props = {
 		programId: Program['id'];
@@ -22,6 +24,7 @@
 
 	let { programId, routineId, exercise, exerciseIndex }: Props = $props();
 	let isOpen = $state(false);
+	let isVolumeChartMode = $state(false);
 
 	function isSameDate(...dates: string[]) {
 		invariant(dates.length >= 2, 'At least two dates are required');
@@ -58,7 +61,7 @@
 	>
 		<span class="sr-only">Open logs modal</span>
 	</Button>
-	<Modal bind:isOpen>
+	<Modal bind:isOpen onClose={() => (isVolumeChartMode = false)}>
 		{#snippet header()}
 			<div class="exercise-item-wrapper">
 				<ExerciseItem
@@ -69,38 +72,47 @@
 					hasDarkerBottomItems
 				/>
 			</div>
+			<div class="volume-chart-toggle">
+				<!-- There is a bug on Safari mobile that shows the focus-visible outline on the toggle when the modal is opened -->
+				<div tabindex="-1" aria-hidden="true"></div>
+				<Toggle label="Volume chart view" bind:checked={isVolumeChartMode} />
+			</div>
 		{/snippet}
-		<div class="logs">
-			{#if logsQuery.data && !logsQuery.data.some( (log) => isSameDate(log.createdAt, new Date().toISOString()) )}
-				<div class="log log-with-button">
-					<p class="log-date">{capitalize(formatRelativeDate(new Date().toISOString()))}</p>
-					<LogSetsModal {programId} {routineId} exerciseId={exercise.id} />
-				</div>
-			{/if}
-			{#each logsQuery.data as log (log.id)}
-				<div class="log">
-					<p class="log-date">{capitalize(formatRelativeDate(log.createdAt))}</p>
-					{#if log.note}
-						<p class="log-note">{log.note}</p>
-					{/if}
-					<div class="log-sets">
-						{#each log.sets as set, index (index)}
-							<div class="set-log">
-								<span class="set-log-number">#{index + 1}</span>
-								<span class="set-log-value">
-									<span class="set-log-unit">reps</span>
-									{set.reps}
-								</span>
-								<span class="set-log-value">
-									<span class="set-log-unit">kg</span>
-									{set.weight}
-								</span>
-							</div>
-						{/each}
+		{#if isVolumeChartMode}
+			<VolumeChart logs={logsQuery.data ?? []} />
+		{:else}
+			<div class="logs">
+				{#if logsQuery.data && !logsQuery.data.some( (log) => isSameDate(log.createdAt, new Date().toISOString()) )}
+					<div class="log log-with-button">
+						<p class="log-date">{capitalize(formatRelativeDate(new Date().toISOString()))}</p>
+						<LogSetsModal {programId} {routineId} exerciseId={exercise.id} />
 					</div>
-				</div>
-			{/each}
-		</div>
+				{/if}
+				{#each logsQuery.data as log (log.id)}
+					<div class="log">
+						<p class="log-date">{capitalize(formatRelativeDate(log.createdAt))}</p>
+						{#if log.note}
+							<p class="log-note">{log.note}</p>
+						{/if}
+						<div class="log-sets">
+							{#each log.sets as set, index (index)}
+								<div class="set-log">
+									<span class="set-log-number">#{index + 1}</span>
+									<span class="set-log-value">
+										<span class="set-log-unit">reps</span>
+										{set.reps}
+									</span>
+									<span class="set-log-value">
+										<span class="set-log-unit">kg</span>
+										{set.weight}
+									</span>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/each}
+			</div>
+		{/if}
 	</Modal>
 </div>
 
@@ -188,5 +200,17 @@
 		width: 110%;
 		height: 100%;
 		inset-inline: -5%;
+	}
+
+	.volume-chart-toggle {
+		position: absolute;
+		top: 0;
+		right: 0;
+		z-index: 1;
+		height: 6.4rem;
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		padding-inline-end: 0.2rem;
 	}
 </style>
