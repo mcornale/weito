@@ -47,7 +47,6 @@
 	let menu = $state<{ close(): void } | undefined>(undefined);
 
 	let isRenameRoutineModalOpen = $state(false);
-	let pendingDirection = $state<-1 | 1 | null>(null);
 
 	const { notifyError } = getNotifierContext();
 
@@ -55,32 +54,29 @@
 
 	const swapOrderMutation = createMutation(() => ({
 		mutationFn: swapRoutineOrder,
-		onSuccess: (_, payload) => {
-			queryClient.setQueryData(getProgramsQueryOptions().queryKey, (data) => {
-				invariant(data, 'Programs data should be in the query cache');
-				return applyRoutineOrderSwap(data, program.id, payload);
-			});
+		onMutate: (payload) => {
+			const programsQueryKey = getProgramsQueryOptions().queryKey;
+			const programsData = queryClient.getQueryData(programsQueryKey);
+			invariant(programsData, 'Programs data should be in the query cache');
+			const updatedPrograms = applyRoutineOrderSwap(programsData, program.id, payload);
+			queryClient.setQueryData(programsQueryKey, updatedPrograms);
 			menu?.close();
+			return { previousPrograms: programsData };
 		},
-		onError: () => {
+		onError: (_, __, context) => {
+			invariant(context && context.previousPrograms, 'Previous programs should be defined');
 			notifyError(`Couldn't move routine. Please try again.`);
-		},
-		onSettled: () => {
-			pendingDirection = null;
+			queryClient.setQueryData(getProgramsQueryOptions().queryKey, context.previousPrograms);
 		}
 	}));
 
 	const index = $derived(program.routines.findIndex((r) => r.id === routine.id));
 	const canMoveUp = $derived(index > 0);
 	const canMoveDown = $derived(index >= 0 && index < program.routines.length - 1);
-	const isMovePending = $derived(swapOrderMutation.isPending);
-	const isMoveUpPending = $derived(isMovePending && pendingDirection === -1);
-	const isMoveDownPending = $derived(isMovePending && pendingDirection === 1);
 
 	function move(direction: -1 | 1) {
 		const otherIndex = index + direction;
 		if (otherIndex < 0 || otherIndex >= program.routines.length) return;
-		pendingDirection = direction;
 		swapOrderMutation.mutate({
 			programId: program.id,
 			routineA: program.routines[index],
@@ -94,21 +90,11 @@
 		<IconPencil size={16} stroke={2.5} aria-hidden="true" />
 		Rename
 	</Button>
-	<Button
-		variant="secondary-ghost"
-		disabled={!canMoveUp || isMovePending}
-		isLoading={isMoveUpPending}
-		onclick={() => move(-1)}
-	>
+	<Button variant="secondary-ghost" disabled={!canMoveUp} onclick={() => move(-1)}>
 		<IconArrowUp size={16} stroke={2.5} aria-hidden="true" />
 		Move up
 	</Button>
-	<Button
-		variant="secondary-ghost"
-		disabled={!canMoveDown || isMovePending}
-		isLoading={isMoveDownPending}
-		onclick={() => move(1)}
-	>
+	<Button variant="secondary-ghost" disabled={!canMoveDown} onclick={() => move(1)}>
 		<IconArrowDown size={16} stroke={2.5} aria-hidden="true" />
 		Move down
 	</Button>

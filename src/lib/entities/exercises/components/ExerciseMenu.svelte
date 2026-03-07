@@ -44,7 +44,6 @@
 
 	let isEditExerciseModalOpen = $state(false);
 	let isRemoveExerciseModalOpen = $state(false);
-	let pendingDirection = $state<-1 | 1 | null>(null);
 
 	const { notifyError } = getNotifierContext();
 
@@ -52,37 +51,32 @@
 
 	const swapExerciseOrderMutation = createMutation(() => ({
 		mutationFn: swapExerciseOrder,
-		onSuccess: (_, payload) => {
-			const queryKey = getExercisesQueryOptions({
-				programId: payload.programId,
-				routineId: payload.routineId
-			}).queryKey;
-
-			queryClient.setQueryData(queryKey, (data) => {
-				invariant(data, 'Exercises data should be in the query cache');
-				return applyExerciseOrderSwap(data, payload);
-			});
+		onMutate: (payload) => {
+			const exercisesQueryKey = getExercisesQueryOptions({ programId, routineId }).queryKey;
+			const exercisesData = queryClient.getQueryData(exercisesQueryKey);
+			invariant(exercisesData, 'Exercises data should be in the query cache');
+			const updatedExercises = applyExerciseOrderSwap(exercisesData, payload);
+			queryClient.setQueryData(exercisesQueryKey, updatedExercises);
 			menu?.close();
+			return { previousExercises: exercisesData };
 		},
-		onError: () => {
+		onError: (_, __, context) => {
+			invariant(context && context.previousExercises, 'Previous exercises should be defined');
 			notifyError(`Couldn't move exercise. Please try again.`);
-		},
-		onSettled: () => {
-			pendingDirection = null;
+			queryClient.setQueryData(
+				getExercisesQueryOptions({ programId, routineId }).queryKey,
+				context.previousExercises
+			);
 		}
 	}));
 
 	const index = $derived(exercises.findIndex((e) => e.id === exercise.id));
 	const canMoveUp = $derived(index > 0);
 	const canMoveDown = $derived(index >= 0 && index < exercises.length - 1);
-	const isMovePending = $derived(swapExerciseOrderMutation.isPending);
-	const isMoveUpPending = $derived(isMovePending && pendingDirection === -1);
-	const isMoveDownPending = $derived(isMovePending && pendingDirection === 1);
 
 	function move(direction: -1 | 1) {
 		const otherIndex = index + direction;
 		if (otherIndex < 0 || otherIndex >= exercises.length) return;
-		pendingDirection = direction;
 		swapExerciseOrderMutation.mutate({
 			exerciseA: exercises[index],
 			exerciseB: exercises[otherIndex],
@@ -97,21 +91,11 @@
 		<IconPencil size={16} stroke={2.5} aria-hidden="true" />
 		Edit
 	</Button>
-	<Button
-		variant="secondary-ghost"
-		disabled={!canMoveUp || isMovePending}
-		isLoading={isMoveUpPending}
-		onclick={() => move(-1)}
-	>
+	<Button variant="secondary-ghost" disabled={!canMoveUp} onclick={() => move(-1)}>
 		<IconArrowUp size={16} stroke={2.5} aria-hidden="true" />
 		Move up
 	</Button>
-	<Button
-		variant="secondary-ghost"
-		disabled={!canMoveDown || isMovePending}
-		isLoading={isMoveDownPending}
-		onclick={() => move(1)}
-	>
+	<Button variant="secondary-ghost" disabled={!canMoveDown} onclick={() => move(1)}>
 		<IconArrowDown size={16} stroke={2.5} aria-hidden="true" />
 		Move down
 	</Button>
