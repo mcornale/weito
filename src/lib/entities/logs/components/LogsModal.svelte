@@ -24,7 +24,7 @@
 
 	let { programId, routineId, exercise, exerciseIndex }: Props = $props();
 	let isOpen = $state(false);
-	let isVolumeChartMode = $state(false);
+	let isAnalyzeVolumeMode = $state(false);
 
 	function isSameDate(...dates: string[]) {
 		invariant(dates.length >= 2, 'At least two dates are required');
@@ -50,6 +50,8 @@
 	const logsQuery = createQuery(() =>
 		getLogsQueryOptions({ programId, routineId, exerciseId: exercise.id })
 	);
+
+	const logs = $derived(logsQuery.data ?? []);
 </script>
 
 <div class="logs-modal">
@@ -61,7 +63,7 @@
 	>
 		<span class="sr-only">Open logs modal</span>
 	</Button>
-	<Modal bind:isOpen onClose={() => (isVolumeChartMode = false)}>
+	<Modal bind:isOpen onClose={() => (isAnalyzeVolumeMode = false)}>
 		{#snippet header()}
 			<div class="exercise-item-wrapper">
 				<ExerciseItem
@@ -73,37 +75,38 @@
 				/>
 			</div>
 			<div class="volume-chart-toggle">
-				<!-- There is a bug on Safari mobile that shows the focus-visible outline on the toggle when the modal is opened -->
+				<!-- There is a bug on Safari mobile that shows the focus-visible outline on the toggle when the modal is opened,
+				 so we need to add a hidden focusable div to prevent it -->
 				<div tabindex="-1" aria-hidden="true"></div>
-				<Toggle label="Analyze volume" bind:checked={isVolumeChartMode} />
+				<Toggle label="Analyze volume" bind:checked={isAnalyzeVolumeMode} />
 			</div>
 		{/snippet}
-		{#if isVolumeChartMode}
-			<VolumeChart logs={logsQuery.data ?? []} />
+		{#if isAnalyzeVolumeMode}
+			<VolumeChart {logs} />
 		{:else}
-			<div class="logs">
-				{#if logsQuery.data && !logsQuery.data.some( (log) => isSameDate(log.createdAt, new Date().toISOString()) )}
-					<div class="log log-with-button">
-						<p class="log-date">{capitalize(formatRelativeDate(new Date().toISOString()))}</p>
+			<div class="section-list">
+				{#if logs.length === 0 || !logs.some( (log) => isSameDate(log.createdAt, new Date().toISOString()) )}
+					<div class="section section-with-button">
+						<p class="section-title">{capitalize(formatRelativeDate(new Date().toISOString()))}</p>
 						<LogSetsModal {programId} {routineId} exerciseId={exercise.id} />
 					</div>
 				{/if}
-				{#each logsQuery.data as log (log.id)}
-					<div class="log">
-						<p class="log-date">{capitalize(formatRelativeDate(log.createdAt))}</p>
+				{#each logs as log (log.id)}
+					<div class="section">
+						<p class="section-title">{capitalize(formatRelativeDate(log.createdAt))}</p>
 						{#if log.note}
 							<p class="log-note">{log.note}</p>
 						{/if}
 						<div class="log-sets">
 							{#each log.sets as set, index (index)}
-								<div class="set-log">
-									<span class="set-log-number">#{index + 1}</span>
-									<span class="set-log-value">
-										<span class="set-log-unit">reps</span>
+								<div class="log-sets-item">
+									<span class="log-sets-item-number">#{index + 1}</span>
+									<span class="log-sets-item-value">
+										<span class="log-sets-item-unit">reps</span>
 										{set.reps}
 									</span>
-									<span class="set-log-value">
-										<span class="set-log-unit">kg</span>
+									<span class="log-sets-item-value">
+										<span class="log-sets-item-unit">kg</span>
 										{set.weight}
 									</span>
 								</div>
@@ -125,23 +128,23 @@
 		padding-block-start: 5rem;
 	}
 
-	.logs {
+	.section-list {
 		display: flex;
 		flex-direction: column;
 		gap: 2.2rem;
 	}
 
-	.log-with-button {
+	.section-with-button {
 		margin-block-end: -1rem;
 	}
 
-	.log-date {
+	.section-title {
 		font-size: 1.4rem;
 		font-weight: 600;
 		color: var(--neutral-12);
 	}
 
-	.set-log {
+	.log-sets-item {
 		display: grid;
 		grid-template-columns: auto 1fr 1fr;
 		gap: 0.4rem;
@@ -157,7 +160,7 @@
 		}
 	}
 
-	.set-log-number {
+	.log-sets-item-number {
 		font-size: 1.4rem;
 		color: var(--neutral-10);
 		font-weight: 500;
@@ -170,7 +173,7 @@
 		letter-spacing: 0.2em;
 	}
 
-	.set-log-value {
+	.log-sets-item-value {
 		background-color: var(--neutral-4);
 		display: flex;
 		justify-content: space-between;
@@ -182,7 +185,7 @@
 		font-weight: 500;
 	}
 
-	.set-log-unit {
+	.log-sets-item-unit {
 		color: var(--neutral-10);
 		font-weight: 600;
 		font-size: 1.4rem;

@@ -20,147 +20,164 @@
 		});
 	});
 
-	const maxVolume = $derived(
-		chartData.length > 0 ? Math.max(...chartData.map((d) => d.volume), 1) : 1
+	const meanVolume = $derived(
+		chartData.length > 0 ? chartData.reduce((s, d) => s + d.volume, 0) / chartData.length : 0
 	);
-
-	type Trend = 'up' | 'down' | 'flat';
-	const trend = $derived.by((): Trend => {
-		if (chartData.length < 2) return 'flat';
-		const first = chartData[0].volume;
-		const last = chartData[chartData.length - 1].volume;
-		const threshold = 0.03;
-		const change = (last - first) / (first || 1);
-		if (change > threshold) return 'up';
-		if (change < -threshold) return 'down';
-		return 'flat';
+	const stdVolume = $derived.by(() => {
+		if (chartData.length < 2) return 1;
+		const variance =
+			chartData.reduce((s, d) => s + (d.volume - meanVolume) ** 2, 0) / (chartData.length - 1);
+		return Math.sqrt(variance) || 1;
 	});
 
-	// 2 units width per point in viewBox → 2rem per point when rendered
-	const widthPerPoint = 2;
-	const chartHeight = 20;
-	const paddingX = 0.5;
-	const paddingY = 0.5;
-
-	const chartWidth = $derived(Math.max(widthPerPoint, chartData.length * widthPerPoint));
-	const plotWidth = $derived(chartWidth - paddingX * 2);
-	const plotHeight = $derived(chartHeight - paddingY * 2);
-
-	const points = $derived(
-		chartData.map((d, i) => {
-			const n = chartData.length;
-			const x = paddingX + (n > 1 ? (i / (n - 1)) * plotWidth : plotWidth / 2);
-			const y = paddingY + plotHeight - (d.volume / maxVolume) * plotHeight;
-			return { x, y, ...d };
+	// Z-score normalization: 0.5 + z/4, clamped to [0, 1]
+	const normalizedData = $derived(
+		chartData.map((item) => {
+			const z = (item.volume - meanVolume) / stdVolume;
+			const raw = 0.5 + z / 4;
+			const normalized = Math.max(0, Math.min(1, raw));
+			return { ...item, normalized };
 		})
 	);
 
-	const linePath = $derived.by(() => {
+	const cellW = 0.7;
+	const gap = 1.2;
+	const chartH = 8;
+	const minBarH = 0.3;
+	const dotR = cellW / 2;
+	const step = cellW + gap;
+	const svgWidth = $derived(
+		normalizedData.length * cellW + Math.max(0, normalizedData.length - 1) * gap
+	);
+
+	// Padding so dots and stroke aren't clipped (top dot extends to y = -2*dotR)
+	const padTop = dotR * 2 + 0.2;
+	const padBottom = 0.25;
+	const padLeft = dotR;
+	const padRight = dotR;
+	const vbX = $derived(-padLeft);
+	const vbY = $derived(-padTop);
+	const vbW = $derived(svgWidth + padLeft + padRight);
+	const vbH = $derived(chartH + padTop + padBottom);
+
+	const bars = $derived(
+		normalizedData.map((item, i) => {
+			const barH = Math.max(item.normalized * chartH, minBarH);
+			const x = i * step;
+			const y = chartH - barH;
+			return { x, y, w: cellW, h: barH, ...item };
+		})
+	);
+
+	const dotCenters = $derived(
+		bars.map((b) => ({
+			x: b.x + cellW / 2,
+			y: b.y - dotR
+		}))
+	);
+
+	// Smooth curve through points (cubic Bezier, Catmull–Rom style)
+	function smoothPath(points: { x: number; y: number }[]): string {
 		if (points.length === 0) return '';
 		if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
-		// Catmull-Rom to cubic Bezier with low tension for a very smooth curve
-		const tension = 0.1;
-		let path = `M ${points[0].x} ${points[0].y}`;
+		const tension = 1 / 6;
+		let d = `M ${points[0].x} ${points[0].y}`;
 		for (let i = 0; i < points.length - 1; i++) {
 			const p0 = points[Math.max(0, i - 1)];
 			const p1 = points[i];
 			const p2 = points[i + 1];
 			const p3 = points[Math.min(points.length - 1, i + 2)];
-			const cp1x = p1.x + (p2.x - p0.x) * tension;
-			const cp1y = p1.y + (p2.y - p0.y) * tension;
-			const cp2x = p2.x - (p3.x - p1.x) * tension;
-			const cp2y = p2.y - (p3.y - p1.y) * tension;
-			path += ` C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${p2.x} ${p2.y}`;
+			const c1x = p1.x + (p2.x - p0.x) * tension;
+			const c1y = p1.y + (p2.y - p0.y) * tension;
+			const c2x = p2.x - (p3.x - p1.x) * tension;
+			const c2y = p2.y - (p3.y - p1.y) * tension;
+			d += ` C ${c1x} ${c1y} ${c2x} ${c2y} ${p2.x} ${p2.y}`;
 		}
-		return path;
-	});
+		return d;
+	}
 
-	// Linear regression trend line
-	const trendLinePath = $derived.by(() => {
-		if (points.length < 2) return '';
-		const n = points.length;
-		let sumX = 0,
-			sumY = 0,
-			sumXY = 0,
-			sumX2 = 0;
-		for (const p of points) {
+	const linePath = $derived(smoothPath(dotCenters));
+
+	// Linear regression trend line through dot centers; slope sign for color (SVG y down: m>0 = line down = trend down)
+	const trend = $derived.by(() => {
+		const pts = dotCenters;
+		if (pts.length < 2) return { path: '', stroke: 'var(--neutral-9)' };
+		const n = pts.length;
+		let sumX = 0;
+		let sumY = 0;
+		let sumXY = 0;
+		let sumX2 = 0;
+		for (const p of pts) {
 			sumX += p.x;
 			sumY += p.y;
 			sumXY += p.x * p.y;
 			sumX2 += p.x * p.x;
 		}
-		const m = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX || 1);
+		const denom = n * sumX2 - sumX * sumX;
+		const m = denom !== 0 ? (n * sumXY - sumX * sumY) / denom : 0;
 		const b = (sumY - m * sumX) / n;
-		const x0 = points[0].x,
-			x1 = points[points.length - 1].x;
-		return `M ${x0} ${m * x0 + b} L ${x1} ${m * x1 + b}`;
+		const x0 = pts[0].x;
+		const x1 = pts[n - 1].x;
+		const y0 = m * x0 + b;
+		const y1 = m * x1 + b;
+		const path = `M ${x0} ${y0} L ${x1} ${y1}`;
+		const stroke = m < 0 ? 'var(--green)' : m > 0 ? 'var(--red)' : 'var(--neutral-9)';
+		return { path, stroke };
 	});
 </script>
 
-{#if chartData.length < 2}
-	<p class="empty-state">Not enough data to show a chart.</p>
+{#if normalizedData.length === 0}
+	<p class="empty">No volume data yet. Log some sets to see the chart.</p>
 {:else}
-	<div class="chart" role="img" aria-label="Volume per session line chart">
-		<svg
-			class="line-chart"
-			viewBox="0 0 {chartWidth} {chartHeight}"
-			style="width: {chartWidth}rem; height: {chartHeight}rem;"
-			preserveAspectRatio="xMinYMid meet"
-			aria-hidden="true"
-		>
-			<path
-				class="trend-line"
-				class:trend-up={trend === 'up'}
-				class:trend-down={trend === 'down'}
-				class:trend-flat={trend === 'flat'}
-				d={trendLinePath}
-				fill="none"
-			/>
-			<path class="line" d={linePath} fill="none" />
-			{#each points as point (point.date)}
-				<circle class="dot" cx={point.x} cy={point.y} r="0.4"></circle>
-			{/each}
-		</svg>
+	<div class="chart" role="img" aria-label="Volume per session chart">
+		<div class="chart-scroll">
+			<svg class="chart-svg" viewBox="{vbX} {vbY} {vbW} {vbH}" preserveAspectRatio="xMidYMid meet">
+				<!-- Trend line (linear regression): green = up, red = down -->
+				<path
+					d={trend.path}
+					fill="none"
+					stroke={trend.stroke}
+					stroke-width="0.15"
+					stroke-dasharray="0.3 0.6"
+					stroke-linecap="round"
+				/>
+				<path
+					d={linePath}
+					fill="none"
+					stroke="var(--neutral-12)"
+					stroke-width="0.15"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				/>
+				{#each bars as bar (bar.date)}
+					<circle class="dot" cx={bar.x + cellW / 2} cy={bar.y - dotR} r={dotR}> </circle>
+				{/each}
+			</svg>
+		</div>
 	</div>
 {/if}
 
 <style>
-	.empty-state {
+	.empty {
 		font-size: 1.4rem;
 		color: var(--neutral-11);
+		margin-block-start: 0.4rem;
 	}
 
 	.chart {
-		display: block;
 		width: 100%;
+		display: flex;
+		overflow-x: auto;
 	}
 
-	.line-chart {
+	.chart-scroll {
+		flex-shrink: 0;
+		height: 10rem;
+	}
+
+	.chart-svg {
 		display: block;
-	}
-
-	.trend-line {
-		stroke-width: 0.14;
-		stroke-dasharray: 0.4 0.35;
-	}
-
-	.trend-line.trend-up {
-		stroke: var(--green);
-	}
-
-	.trend-line.trend-down {
-		stroke: var(--red);
-	}
-
-	.trend-line.trend-flat {
-		stroke: var(--neutral-8);
-	}
-
-	.line {
-		stroke: var(--neutral-12);
-		stroke-width: 0.2;
-		stroke-linecap: round;
-		stroke-linejoin: round;
+		height: 100%;
 	}
 
 	.dot {

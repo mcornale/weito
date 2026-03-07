@@ -154,6 +154,7 @@
 	.content {
 		padding: 2rem;
 		padding-block-start: 1.2rem;
+		min-height: 100%;
 	}
 
 	.header {
