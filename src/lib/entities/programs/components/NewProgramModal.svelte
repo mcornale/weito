@@ -67,7 +67,7 @@
 </script>
 
 <div class="new-program-modal">
-	<Button class="new-program-button" variant="primary" onclick={() => (isOpen = true)}>
+	<Button class="new-program-button" size="big" variant="primary" onclick={() => (isOpen = true)}>
 		<IconPlus size={16} stroke={2.5} aria-hidden="true" />
 		New program
 	</Button>
