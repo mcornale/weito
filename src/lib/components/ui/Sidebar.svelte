@@ -104,8 +104,8 @@
 
 		&[data-animate='true'] {
 			transition:
-				transform 0.3s ease-out,
-				display 0.3s ease-out allow-discrete;
+				transform 0.3s var(--ease-quad-out),
+				display 0.3s var(--ease-quad-out) allow-discrete;
 		}
 	}
 

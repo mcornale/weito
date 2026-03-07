@@ -89,8 +89,8 @@
 		z-index: 1000;
 
 		transition:
-			opacity 0.15s ease-out,
-			transform 0.3s ease-out;
+			opacity 0.15s var(--ease-quad-out),
+			transform 0.3s var(--ease-quad-out);
 
 		opacity: 1;
 		transform: translateY(0) scale(1);
@@ -113,8 +113,8 @@
 			border-radius: 2.4rem;
 
 			transition:
-				opacity 0.15s ease-out,
-				transform 0.2s ease-out;
+				opacity 0.15s var(--ease-quad-out),
+				transform 0.2s var(--ease-quad-out);
 
 			transform: translate(-50%, -50%) scale(1);
 			opacity: 1;
@@ -129,10 +129,10 @@
 			background-color: rgba(0, 0, 0, 0.2);
 			backdrop-filter: blur(2px);
 			opacity: 1;
-			transition: opacity 0.3s ease-out;
+			transition: opacity 0.3s var(--ease-quad-out);
 
 			@media (width >= 576px) {
-				transition: opacity 0.2s ease-out;
+				transition: opacity 0.2s var(--ease-quad-out);
 			}
 
 			@starting-style {

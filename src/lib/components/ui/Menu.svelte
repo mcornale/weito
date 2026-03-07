@@ -46,8 +46,8 @@
 		position-try-fallbacks: flip-block, flip-inline;
 
 		transition:
-			opacity 0.15s ease-out,
-			transform 0.15s ease-out;
+			opacity 0.15s var(--ease-quad-out),
+			transform 0.15s var(--ease-quad-out);
 
 		opacity: 1;
 		transform: translateY(0) scale(1);

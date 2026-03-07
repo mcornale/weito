@@ -115,8 +115,8 @@
 
 		&[data-animate='true'] {
 			transition:
-				transform 0.3s ease-out,
-				padding-inline-start 0.3s ease-out;
+				transform 0.3s var(--ease-quad-out),
+				padding-inline-start 0.3s var(--ease-quad-out);
 		}
 	}
 

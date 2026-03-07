@@ -25,7 +25,6 @@
 	let programName = $state('');
 
 	let isOpen = $state(false);
-	let isLoading = $state(false);
 
 	function removeRoutine(id: number) {
 		routines = routines.filter((r) => r.id !== id);

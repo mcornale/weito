@@ -57,7 +57,7 @@
 		align-items: center;
 		transform: scale(1);
 		opacity: 1;
-		transition: background-color 0.2s ease-out;
+		transition: background-color 0.2s var(--ease-quad-out);
 
 		&:has(input:checked) {
 			background-color: var(--neutral-12);
@@ -83,7 +83,7 @@
 		border-radius: calc(var(--inner-size) / 2);
 		display: grid;
 		place-items: center;
-		transition: transform 0.2s ease-out;
+		transition: transform 0.2s var(--ease-quad-out);
 	}
 
 	.toggle:has(input:checked) .toggle-inner {
