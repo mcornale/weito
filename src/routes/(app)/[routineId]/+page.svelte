@@ -59,7 +59,7 @@
 </div>
 
 <Toggle
-	label="Edit mode"
+	label="Manage exercises"
 	bind:checked={isEditing}
 	disabled={!exercises || exercises.length === 0}
 	{@attach portalToMainTop}

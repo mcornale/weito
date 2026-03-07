@@ -75,7 +75,7 @@
 			<div class="volume-chart-toggle">
 				<!-- There is a bug on Safari mobile that shows the focus-visible outline on the toggle when the modal is opened -->
 				<div tabindex="-1" aria-hidden="true"></div>
-				<Toggle label="Volume chart view" bind:checked={isVolumeChartMode} />
+				<Toggle label="Analyze volume" bind:checked={isVolumeChartMode} />
 			</div>
 		{/snippet}
 		{#if isVolumeChartMode}
