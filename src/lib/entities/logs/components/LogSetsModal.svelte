@@ -142,6 +142,7 @@
 						kg
 						<Input
 							type="number"
+							step="0.1"
 							inputmode="decimal"
 							bind:value={set.weight}
 							class="set-log-input"
