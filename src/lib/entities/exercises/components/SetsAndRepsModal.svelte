@@ -1,13 +1,11 @@
 <script lang="ts">
-	import { IconArrowLeft, IconPlus, IconRepeat, IconTrash } from '@tabler/icons-svelte';
+	import { IconArrowLeft, IconPlus, IconTrash } from '@tabler/icons-svelte';
 
 	import Button from '$lib/components/ui/Button.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
 	import InputLabel from '$lib/components/ui/InputLabel.svelte';
 	import Modal from '$lib/components/ui/Modal.svelte';
 	import { listItemSlideIn, listItemSlideOut } from '$lib/transitions';
-
-	import { formatSetsAndReps } from '../utils';
 
 	type SetsAndRepsItem = {
 		id: number;
@@ -17,34 +15,20 @@
 
 	type Props = {
 		setsAndReps: SetsAndRepsItem[];
-		defaultSets: number;
-		defaultReps: string;
+		isOpen: boolean;
 	};
 
-	let { setsAndReps = $bindable(), defaultSets, defaultReps }: Props = $props();
+	let { setsAndReps = $bindable(), isOpen = $bindable() }: Props = $props();
 
-	let isOpen = $state(false);
 	let nextId = $state(0);
 
 	function addVariation() {
 		nextId++;
-		setsAndReps = [...setsAndReps, { id: nextId, sets: 1, reps: defaultReps }];
+		setsAndReps = [...setsAndReps, { id: nextId, sets: 1, reps: '10' }];
 	}
 </script>
 
 <div class="sets-and-reps-modal">
-	<Button
-		variant="secondary"
-		size="small"
-		class="exercise-info-button"
-		onclick={() => (isOpen = true)}
-	>
-		<IconRepeat size={14} aria-hidden="true" />
-		{formatSetsAndReps(
-			setsAndReps.map((set) => ({ sets: set.sets ?? defaultSets, reps: set.reps || defaultReps }))
-		)}
-		<span class="sr-only">Edit sets and reps</span>
-	</Button>
 	<Modal bind:isOpen hasNoBackdrop>
 		{#snippet header()}
 			<h2 class="title">Sets and reps</h2>
@@ -110,14 +94,6 @@
 <style>
 	.sets-and-reps-modal {
 		display: contents;
-	}
-
-	.sets-and-reps-modal :global(.exercise-info-button) {
-		gap: 0.8rem;
-		font-weight: 500;
-		height: 2.8rem;
-		padding-inline: 0.8rem;
-		border-radius: 0.8rem;
 	}
 
 	.title {

@@ -1,7 +1,11 @@
 <script lang="ts">
+	import { IconClock, IconRepeat } from '@tabler/icons-svelte';
+
 	import FormModal from '$lib/components/FormModal.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
 
+	import { formatSetsAndReps } from '../utils';
 	import RestTimeModal from './RestTimeModal.svelte';
 	import SetsAndRepsModal from './SetsAndRepsModal.svelte';
 
@@ -31,11 +35,15 @@
 	const defaultReps = '7-10';
 	const defaultRestTime = { minutes: 3, seconds: 0 };
 
+	let isSetsAndRepsModalOpen = $state(false);
+	let isRestTimeModalOpen = $state(false);
 	let exerciseName = $state('');
 	let setsAndReps = $state<SetsAndRepsItem[]>([{ id: 0, sets: defaultSets, reps: defaultReps }]);
 	let restTime = $state<{ minutes: number | null; seconds: number | null }>(defaultRestTime);
 
-	const isSubmitDisabled = $derived(isLoading || !exerciseName);
+	const isSubmitDisabled = $derived(
+		isLoading || !exerciseName || isSetsAndRepsModalOpen || isRestTimeModalOpen
+	);
 
 	function setDefaults() {
 		exerciseName = '';
@@ -105,15 +113,41 @@
 			/>
 		</label>
 		<div class="exercise-info-list">
-			<SetsAndRepsModal bind:setsAndReps {defaultSets} {defaultReps} />
-			<RestTimeModal
-				bind:minutes={restTime.minutes}
-				bind:seconds={restTime.seconds}
-				defaultMinutes={defaultRestTime.minutes}
-				defaultSeconds={defaultRestTime.seconds}
-			/>
+			<Button
+				variant="secondary"
+				size="small"
+				class="exercise-info-button"
+				onclick={() => (isSetsAndRepsModalOpen = true)}
+			>
+				<IconRepeat size={14} aria-hidden="true" />
+				{formatSetsAndReps(
+					setsAndReps.map((set) => ({
+						sets: set.sets ?? defaultSets,
+						reps: set.reps || defaultReps
+					}))
+				)}
+				<span class="sr-only">Edit sets and reps</span>
+			</Button>
+			<Button
+				variant="secondary"
+				size="small"
+				class="exercise-info-button"
+				onclick={() => (isRestTimeModalOpen = true)}
+			>
+				<IconClock size={14} aria-hidden="true" />
+				{restTime.minutes ?? defaultRestTime.minutes}:{(restTime.seconds ?? defaultRestTime.seconds)
+					.toString()
+					.padStart(2, '0')}
+				<span class="sr-only">Edit rest time</span>
+			</Button>
 		</div>
 	</FormModal>
+	<SetsAndRepsModal bind:isOpen={isSetsAndRepsModalOpen} bind:setsAndReps />
+	<RestTimeModal
+		bind:isOpen={isRestTimeModalOpen}
+		bind:minutes={restTime.minutes}
+		bind:seconds={restTime.seconds}
+	/>
 </div>
 
 <style>
@@ -132,5 +166,13 @@
 	.exercise-info-list {
 		display: flex;
 		gap: 0.4rem;
+	}
+
+	.exercise-info-list :global(.exercise-info-button) {
+		gap: 0.8rem;
+		font-weight: 500;
+		height: 2.8rem;
+		padding-inline: 0.8rem;
+		border-radius: 0.8rem;
 	}
 </style>

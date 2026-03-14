@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { IconArrowLeft, IconClock } from '@tabler/icons-svelte';
+	import { IconArrowLeft } from '@tabler/icons-svelte';
 
 	import Button from '$lib/components/ui/Button.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
@@ -9,30 +9,13 @@
 	type Props = {
 		minutes: number | null;
 		seconds: number | null;
-		defaultMinutes: number;
-		defaultSeconds: number;
+		isOpen: boolean;
 	};
 
-	let {
-		minutes = $bindable(),
-		seconds = $bindable(),
-		defaultMinutes,
-		defaultSeconds
-	}: Props = $props();
-	let isOpen = $state(false);
+	let { minutes = $bindable(), seconds = $bindable(), isOpen = $bindable() }: Props = $props();
 </script>
 
 <div class="rest-time-modal">
-	<Button
-		variant="secondary"
-		size="small"
-		class="exercise-info-button"
-		onclick={() => (isOpen = true)}
-	>
-		<IconClock size={14} aria-hidden="true" />
-		{minutes ?? defaultMinutes}:{(seconds ?? defaultSeconds).toString().padStart(2, '0')}
-		<span class="sr-only">Edit rest time</span>
-	</Button>
 	<Modal bind:isOpen hasNoBackdrop>
 		{#snippet header()}
 			<h2 class="title">Rest time</h2>
@@ -73,14 +56,6 @@
 <style>
 	.rest-time-modal {
 		display: contents;
-	}
-
-	.rest-time-modal :global(.exercise-info-button) {
-		gap: 0.8rem;
-		font-weight: 500;
-		height: 2.8rem;
-		padding-inline: 0.8rem;
-		border-radius: 0.8rem;
 	}
 
 	.title {
