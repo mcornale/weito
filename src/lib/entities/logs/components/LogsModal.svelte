@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { IconArrowLeft } from '@tabler/icons-svelte';
 	import { createQuery } from '@tanstack/svelte-query';
 	import invariant from 'tiny-invariant';
 
@@ -64,6 +65,12 @@
 		<span class="sr-only">Open logs modal</span>
 	</Button>
 	<Modal bind:isOpen onClose={() => (isAnalyzeVolumeMode = false)}>
+		{#snippet actions()}
+			<Button variant="tertiary" isIconOnly onclick={() => (isOpen = false)} size="small">
+				<IconArrowLeft size={18} stroke={2.5} aria-hidden="true" />
+				<span class="sr-only">Close</span>
+			</Button>
+		{/snippet}
 		{#snippet header()}
 			<div class="exercise-item-wrapper">
 				<ExerciseItem

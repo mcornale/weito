@@ -1,11 +1,5 @@
 <script lang="ts">
-	import {
-		IconArrowDown,
-		IconArrowLeft,
-		IconArrowUp,
-		IconPlus,
-		IconTrash
-	} from '@tabler/icons-svelte';
+	import { IconArrowLeft, IconArrowRight, IconPlus, IconTrash } from '@tabler/icons-svelte';
 	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 	import { tick } from 'svelte';
 	import invariant from 'tiny-invariant';
@@ -86,7 +80,7 @@
 		onclick={() => (isOpen = true)}
 	>
 		{#if isLogging}
-			<IconArrowUp size={14} stroke={2.5} aria-hidden="true" />
+			<IconArrowRight size={14} stroke={2.5} aria-hidden="true" />
 			Resume logging
 		{:else}
 			<IconPlus size={14} stroke={2.5} aria-hidden="true" />
@@ -113,11 +107,7 @@
 		hasNoBackdrop
 	>
 		{#snippet closeIcon()}
-			{#if isLogging}
-				<IconArrowDown size={18} stroke={2.5} aria-hidden="true" />
-			{:else}
-				<IconArrowLeft size={18} stroke={2.5} aria-hidden="true" />
-			{/if}
+			<IconArrowLeft size={18} stroke={2.5} aria-hidden="true" />
 		{/snippet}
 		<Input type="text" placeholder="Note" bind:value={note} name="note" class="note-input" />
 		<div class="set-log-rows">
@@ -131,6 +121,7 @@
 						<Input
 							type="number"
 							inputmode="numeric"
+							name="reps"
 							class="set-log-input"
 							bind:value={set.reps}
 							{@attach (node) => {
@@ -144,6 +135,7 @@
 							type="number"
 							step="0.1"
 							inputmode="decimal"
+							name="weight"
 							bind:value={set.weight}
 							class="set-log-input"
 						/>

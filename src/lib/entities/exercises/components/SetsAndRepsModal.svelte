@@ -41,7 +41,7 @@
 						<Input
 							placeholder="3"
 							inputmode="numeric"
-							name="sets-{variation.id}"
+							name="sets"
 							type="number"
 							class="sets-input"
 							bind:value={variation.sets}
@@ -55,7 +55,7 @@
 						<Input
 							placeholder="7-10"
 							inputmode="text"
-							name="reps-{variation.id}"
+							name="reps"
 							bind:value={variation.reps}
 							class="reps-input"
 						/>

@@ -59,13 +59,7 @@
 			{#if actions}
 				{@render actions()}
 			{:else}
-				<Button
-					variant="tertiary"
-					class="close-button"
-					isIconOnly
-					onclick={() => (isOpen = false)}
-					size="small"
-				>
+				<Button variant="tertiary" isIconOnly onclick={() => (isOpen = false)} size="small">
 					<IconX size={18} stroke={2.5} aria-hidden="true" />
 					<span class="sr-only">Close</span>
 				</Button>
