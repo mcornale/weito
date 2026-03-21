@@ -96,15 +96,11 @@
 			<div class="analyze-charts">
 				<div class="analyze-section">
 					<p class="analyze-label">Volume</p>
-					<div class="analyze-chart">
-						<VolumeChart {logs} />
-					</div>
+					<VolumeChart {logs} />
 				</div>
 				<div class="analyze-section">
 					<p class="analyze-label">Est. 1RM</p>
-					<div class="analyze-chart">
-						<OneRMChart {logs} />
-					</div>
+					<OneRMChart {logs} />
 				</div>
 			</div>
 		{:else}
@@ -189,13 +185,6 @@
 		font-size: 1.4rem;
 		font-weight: 600;
 		color: var(--neutral-12);
-	}
-
-	.analyze-chart {
-		background-color: var(--neutral-4);
-		border-radius: 0.8rem;
-		padding: 1.2rem;
-		margin-block-start: 1rem;
 	}
 
 	.section-list {

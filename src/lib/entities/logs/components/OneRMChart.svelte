@@ -180,6 +180,10 @@
 		display: flex;
 		flex-direction: column;
 		overflow-x: auto;
+		background-color: var(--neutral-4);
+		border-radius: 0.8rem;
+		padding: 1.2rem;
+		margin-block-start: 1rem;
 	}
 
 	.chart-scroll {
