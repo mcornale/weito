@@ -13,13 +13,12 @@ export function requireCurrentUser() {
 }
 
 export async function getCurrentUser() {
-	const listenToAuthStateChanges = new Promise((res) => {
-		firebaseAuth.onAuthStateChanged(auth, async (user) => {
+	return new Promise<firebaseAuth.User | null>((res) => {
+		const unsubscribe = firebaseAuth.onAuthStateChanged(auth, (user) => {
+			unsubscribe();
 			res(user);
 		});
-	}) as Promise<firebaseAuth.User | null>;
-
-	return listenToAuthStateChanges;
+	});
 }
 
 export function signInWithGoogle() {
