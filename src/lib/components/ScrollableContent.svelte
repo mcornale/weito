@@ -44,7 +44,7 @@
 
 <style>
 	.scrollable-content {
-		--content-fade-height: 4rem;
+		--content-fade-height: 2rem;
 		--content-fade-color: var(--fade-color);
 		overflow-y: auto;
 		overflow-x: hidden;

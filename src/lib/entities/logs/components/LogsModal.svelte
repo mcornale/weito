@@ -15,6 +15,7 @@
 	import { capitalize } from '$lib/utils';
 
 	import LogSetsModal from './LogSetsModal.svelte';
+	import OneRMChart from './OneRMChart.svelte';
 	import VolumeChart from './VolumeChart.svelte';
 
 	type Props = {
@@ -26,7 +27,7 @@
 
 	let { programId, routineId, exercise, exerciseIndex }: Props = $props();
 	let isOpen = $state(false);
-	let isAnalyzeVolumeMode = $state(false);
+	let isAnalyzeMode = $state(false);
 	let editingLog = $state<Log | null>(null);
 	let isEditModalOpen = $state(false);
 
@@ -67,7 +68,7 @@
 	>
 		<span class="sr-only">Open logs modal</span>
 	</Button>
-	<Modal bind:isOpen onClose={() => (isAnalyzeVolumeMode = false)}>
+	<Modal bind:isOpen onClose={() => (isAnalyzeMode = false)}>
 		{#snippet actions()}
 			<Button variant="tertiary" isIconOnly onclick={() => (isOpen = false)} size="small">
 				<IconArrowLeft size={18} stroke={2.5} aria-hidden="true" />
@@ -84,15 +85,28 @@
 					hasDarkerBottomItems
 				/>
 			</div>
-			<div class="volume-chart-toggle">
+			<div class="analyze-toggle">
 				<!-- There is a bug on Safari mobile that shows the focus-visible outline on the toggle when the modal is opened,
 				 so we need to add a hidden focusable div to prevent it -->
 				<div tabindex="-1" aria-hidden="true"></div>
-				<Toggle label="Analyze volume" bind:checked={isAnalyzeVolumeMode} />
+				<Toggle label="Analyze" bind:checked={isAnalyzeMode} />
 			</div>
 		{/snippet}
-		{#if isAnalyzeVolumeMode}
-			<VolumeChart {logs} />
+		{#if isAnalyzeMode}
+			<div class="analyze-charts">
+				<div class="analyze-section">
+					<p class="analyze-label">Volume</p>
+					<div class="analyze-chart">
+						<VolumeChart {logs} />
+					</div>
+				</div>
+				<div class="analyze-section">
+					<p class="analyze-label">Est. 1RM</p>
+					<div class="analyze-chart">
+						<OneRMChart {logs} />
+					</div>
+				</div>
+			</div>
 		{:else}
 			<div class="section-list">
 				{#if logs.length === 0 || !logs.some( (log) => isSameDate(log.createdAt, new Date().toISOString()) )}
@@ -160,6 +174,30 @@
 		padding-block-start: 5rem;
 	}
 
+	.analyze-charts {
+		display: flex;
+		flex-direction: column;
+		gap: 2.4rem;
+	}
+
+	.analyze-section {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.analyze-label {
+		font-size: 1.4rem;
+		font-weight: 600;
+		color: var(--neutral-12);
+	}
+
+	.analyze-chart {
+		background-color: var(--neutral-4);
+		border-radius: 0.8rem;
+		padding: 1.2rem;
+		margin-block-start: 1rem;
+	}
+
 	.section-list {
 		display: flex;
 		flex-direction: column;
@@ -182,7 +220,7 @@
 		font-size: 1.4rem;
 		font-weight: 600;
 		color: var(--neutral-12);
-		margin-block-end: 0.8rem;
+		margin-block-end: 1rem;
 	}
 
 	.logs-modal :global(.edit-log-button) {
@@ -246,7 +284,7 @@
 		color: var(--neutral-11);
 		font-weight: 500;
 		margin-block-start: -0.6rem;
-		margin-block-end: 0.8rem;
+		margin-block-end: 1rem;
 	}
 
 	.logs-modal :global(.open-logs-modal-button) {
@@ -257,7 +295,7 @@
 		inset-inline: -5%;
 	}
 
-	.volume-chart-toggle {
+	.analyze-toggle {
 		position: absolute;
 		top: 0;
 		right: 0;
