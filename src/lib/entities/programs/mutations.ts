@@ -3,6 +3,8 @@ import { collection, deleteDoc, doc, getDocs, setDoc, writeBatch } from 'firebas
 import { requireCurrentUser } from '$lib/features/auth';
 import { db, deleteCollectionInBatches } from '$lib/firebase';
 
+import { getExercises } from '../exercises/queries';
+import { getRoutines } from '../routines/queries';
 import type { Routine } from '../routines/types';
 import type { Program } from './types';
 
@@ -46,6 +48,72 @@ export async function createProgram(payload: CreateProgramPayload) {
 		id: programRef.id,
 		...programData,
 		routines: createdRoutines
+	} satisfies Program as Program;
+}
+
+type DuplicateProgramPayload = Pick<Program, 'id' | 'name'>;
+
+export async function duplicateProgram(payload: DuplicateProgramPayload) {
+	const user = requireCurrentUser();
+	const now = new Date().toISOString();
+
+	const { id: sourceProgramId, name } = payload;
+	const routines = await getRoutines(sourceProgramId);
+	const exercisesByRoutine = await Promise.all(
+		routines.map((r) => getExercises(sourceProgramId, r.id))
+	);
+
+	const programsRef = collection(db, 'users', user.uid, 'programs');
+	const programRef = doc(programsRef);
+	const newProgramId = programRef.id;
+
+	const programData = { name, createdAt: now };
+
+	const batch = writeBatch(db);
+	batch.set(programRef, programData);
+
+	const newRoutines: Routine[] = [];
+
+	for (let i = 0; i < routines.length; i++) {
+		const routine = routines[i];
+		const routinesRef = collection(db, 'users', user.uid, 'programs', newProgramId, 'routines');
+		const routineRef = doc(routinesRef);
+		const routineData = {
+			name: routine.name,
+			order: routine.order,
+			programId: newProgramId,
+			createdAt: now
+		};
+		batch.set(routineRef, routineData);
+		newRoutines.push({ id: routineRef.id, ...routineData });
+
+		for (const exercise of exercisesByRoutine[i]) {
+			const exercisesRef = collection(
+				db,
+				'users',
+				user.uid,
+				'programs',
+				newProgramId,
+				'routines',
+				routineRef.id,
+				'exercises'
+			);
+			batch.set(doc(exercisesRef), {
+				name: exercise.name,
+				order: exercise.order,
+				setsAndReps: exercise.setsAndReps,
+				restTime: exercise.restTime,
+				createdAt: now
+			});
+		}
+	}
+
+	await batch.commit();
+
+	return {
+		id: newProgramId,
+		...programData,
+		routines: newRoutines
 	} satisfies Program as Program;
 }
 
