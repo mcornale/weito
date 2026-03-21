@@ -36,7 +36,7 @@
 		background-color: var(--neutral-1);
 		border-radius: 1.2rem;
 		padding: 0.4rem;
-		border: 1px solid var(--neutral-5);
+		border: 1px solid var(--neutral-4);
 		min-width: 20rem;
 
 		margin: 0;

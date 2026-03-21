@@ -162,13 +162,14 @@
 		display: flex;
 		align-items: center;
 
-		&:empty {
-			height: 0;
-		}
 		@media (width >= 1024px) {
 			position: fixed;
 			top: 0.8rem;
 			right: 0;
+		}
+
+		&:empty {
+			height: 0;
 		}
 	}
 
@@ -176,9 +177,10 @@
 		width: 100%;
 		height: 100%;
 		background-color: var(--neutral-1);
-		border: 1px solid var(--neutral-5);
+		border: 1px solid var(--neutral-4);
 		border-radius: 1.2rem;
 		overflow-y: auto;
+		container-type: inline-size;
 
 		.main-content {
 			max-width: 68rem;

@@ -107,13 +107,20 @@
 			<div class="section-list">
 				{#if logs.length === 0 || !logs.some( (log) => isSameDate(log.createdAt, new Date().toISOString()) )}
 					<div class="section section-with-button">
-						<p class="section-title">{capitalize(formatRelativeDate(new Date().toISOString()))}</p>
+						<p class="section-title">
+							{capitalize(formatRelativeDate(new Date().toISOString()))}
+						</p>
 						<LogSetsModal {programId} {routineId} exerciseId={exercise.id} />
 					</div>
 				{/if}
 				{#each logs as log (log.id)}
 					<div class="section">
-						<p class="section-title">{capitalize(formatRelativeDate(log.createdAt))}</p>
+						<p class="section-title">
+							{capitalize(formatRelativeDate(log.createdAt))} - {new Intl.DateTimeFormat('en', {
+								month: 'long',
+								day: 'numeric'
+							}).format(new Date(log.createdAt))}
+						</p>
 						<Button
 							variant="secondary-ghost"
 							isIconOnly
@@ -279,7 +286,7 @@
 	.logs-modal :global(.open-logs-modal-button) {
 		background-color: transparent;
 		position: absolute;
-		width: 110%;
+		width: calc(100% + 4rem);
 		height: 100%;
 		inset-inline: -5%;
 	}

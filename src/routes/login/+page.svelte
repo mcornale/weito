@@ -23,7 +23,7 @@
 			class="actions-button"
 		>
 			<IconBrandGoogleFilled size={16} aria-hidden="true" />
-			Login with Google
+			Continue with Google
 		</Button>
 	</div>
 </main>

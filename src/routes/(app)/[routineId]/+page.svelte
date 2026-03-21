@@ -110,13 +110,11 @@
 <style>
 	.exercise-list {
 		padding-inline: 2rem;
+		padding-block: 0;
+		transition: padding-block 0.2s;
 
-		@media (width >= 720px) {
+		@container (width >= 720px) {
 			padding-block: 2rem;
-		}
-
-		@media (width >= 1024px) {
-			padding-block: 2.8rem;
 		}
 	}
 

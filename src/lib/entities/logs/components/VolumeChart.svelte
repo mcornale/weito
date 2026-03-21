@@ -127,7 +127,7 @@
 </script>
 
 {#if normalizedData.length === 0}
-	<p class="empty">No volume data yet. Log some sets to see the chart.</p>
+	<p class="empty">No data yet. Log some sets to see the chart.</p>
 {:else}
 	<div class="chart" role="img" aria-label="Volume per session chart">
 		<div class="chart-scroll">
