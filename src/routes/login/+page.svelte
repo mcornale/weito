@@ -5,8 +5,8 @@
 	import { resolve } from '$app/paths';
 	import Logo from '$lib/components/Logo.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
-	import { signInWithGoogle } from '$lib/features/auth';
 	import { showAppLoader } from '$lib/features/app-loader';
+	import { signInWithGoogle } from '$lib/features/auth';
 </script>
 
 <main>

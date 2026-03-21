@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { IconArrowLeft } from '@tabler/icons-svelte';
+	import { IconArrowLeft, IconPencil } from '@tabler/icons-svelte';
 	import { createQuery } from '@tanstack/svelte-query';
 	import invariant from 'tiny-invariant';
 
@@ -9,6 +9,7 @@
 	import ExerciseItem from '$lib/entities/exercises/components/ExerciseItem.svelte';
 	import type { Exercise } from '$lib/entities/exercises/types';
 	import { getLogsQueryOptions } from '$lib/entities/logs/queries';
+	import type { Log } from '$lib/entities/logs/types';
 	import type { Program } from '$lib/entities/programs/types';
 	import type { Routine } from '$lib/entities/routines/types';
 	import { capitalize } from '$lib/utils';
@@ -26,6 +27,8 @@
 	let { programId, routineId, exercise, exerciseIndex }: Props = $props();
 	let isOpen = $state(false);
 	let isAnalyzeVolumeMode = $state(false);
+	let editingLog = $state<Log | null>(null);
+	let isEditModalOpen = $state(false);
 
 	function isSameDate(...dates: string[]) {
 		invariant(dates.length >= 2, 'At least two dates are required');
@@ -101,6 +104,19 @@
 				{#each logs as log (log.id)}
 					<div class="section">
 						<p class="section-title">{capitalize(formatRelativeDate(log.createdAt))}</p>
+						<Button
+							variant="secondary-ghost"
+							isIconOnly
+							size="small"
+							class="edit-log-button"
+							onclick={() => {
+								editingLog = log;
+								isEditModalOpen = true;
+							}}
+						>
+							<IconPencil size={14} stroke={2.5} aria-hidden="true" />
+							<span class="sr-only">Edit log</span>
+						</Button>
 						{#if log.note}
 							<p class="log-note">{log.note}</p>
 						{/if}
@@ -124,6 +140,15 @@
 			</div>
 		{/if}
 	</Modal>
+	{#if editingLog}
+		<LogSetsModal
+			{programId}
+			{routineId}
+			exerciseId={exercise.id}
+			log={editingLog}
+			bind:isOpen={isEditModalOpen}
+		/>
+	{/if}
 </div>
 
 <style>
@@ -138,17 +163,35 @@
 	.section-list {
 		display: flex;
 		flex-direction: column;
-		gap: 2.2rem;
+		gap: 2.8rem;
+	}
+
+	.section {
+		position: relative;
 	}
 
 	.section-with-button {
 		margin-block-end: -1rem;
+
+		.section-title {
+			margin-block-end: 0;
+		}
 	}
 
 	.section-title {
 		font-size: 1.4rem;
 		font-weight: 600;
 		color: var(--neutral-12);
+		margin-block-end: 0.8rem;
+	}
+
+	.logs-modal :global(.edit-log-button) {
+		color: var(--neutral-10);
+		position: absolute;
+		top: 0;
+		right: 0;
+		margin-inline-end: -0.6rem;
+		margin-block-start: -0.8rem;
 	}
 
 	.log-sets-item {
@@ -202,6 +245,8 @@
 		font-size: 1.4rem;
 		color: var(--neutral-11);
 		font-weight: 500;
+		margin-block-start: -0.6rem;
+		margin-block-end: 0.8rem;
 	}
 
 	.logs-modal :global(.open-logs-modal-button) {

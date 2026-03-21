@@ -9,9 +9,9 @@
 	import Input from '$lib/components/ui/Input.svelte';
 	import InputLabel from '$lib/components/ui/InputLabel.svelte';
 	import type { Exercise } from '$lib/entities/exercises/types';
-	import { createLog } from '$lib/entities/logs/mutations';
+	import { createLog, updateLog } from '$lib/entities/logs/mutations';
 	import { getLogsQueryOptions } from '$lib/entities/logs/queries';
-	import type { LogSet } from '$lib/entities/logs/types';
+	import type { Log, LogSet } from '$lib/entities/logs/types';
 	import type { Program } from '$lib/entities/programs/types';
 	import type { Routine } from '$lib/entities/routines/types';
 	import { getNotifierContext } from '$lib/features/notifier/context';
@@ -21,10 +21,11 @@
 		programId: Program['id'];
 		routineId: Routine['id'];
 		exerciseId: Exercise['id'];
+		log?: Log;
+		isOpen?: boolean;
 	};
 
-	let { programId, routineId, exerciseId }: Props = $props();
-	let isOpen = $state(false);
+	let { programId, routineId, exerciseId, log, isOpen = $bindable(false) }: Props = $props();
 
 	type SetState = {
 		id: number;
@@ -35,12 +36,23 @@
 	let sets = $state<SetState[]>([]);
 	let nextSetId = $state(0);
 	let note = $state('');
+	let shouldSkipAnimation = $state(false);
 
 	function resetForm() {
 		sets = [];
 		nextSetId = 0;
 		note = '';
 	}
+
+	$effect(() => {
+		if (isOpen && log) {
+			shouldSkipAnimation = true;
+			sets = log.sets.map((s, i) => ({ id: i, weight: s.weight, reps: s.reps }));
+			nextSetId = log.sets.length;
+			note = log.note ?? '';
+			tick().then(() => (shouldSkipAnimation = false));
+		}
+	});
 
 	async function addSet() {
 		sets = [...sets, { id: nextSetId++, weight: null, reps: null }];
@@ -66,6 +78,22 @@
 		}
 	}));
 
+	const updateLogMutation = createMutation(() => ({
+		mutationFn: updateLog,
+		onSuccess: (updatedLog) => {
+			queryClient.setQueryData(
+				getLogsQueryOptions({ programId, routineId, exerciseId }).queryKey,
+				(data) => data?.map((l) => (l.id === updatedLog.id ? updatedLog : l)) ?? []
+			);
+			isOpen = false;
+			resetForm();
+		},
+		onError: () => {
+			notifyError(`Couldn't update log. Please try again.`);
+		}
+	}));
+
+	const isPending = $derived(createLogMutation.isPending || updateLogMutation.isPending);
 	const areFieldsInvalid = $derived(
 		sets.length === 0 || sets.some((s) => s.weight === null || s.reps === null)
 	);
@@ -73,37 +101,56 @@
 </script>
 
 <div class="log-sets-modal">
-	<Button
-		variant="secondary-ghost"
-		size="big"
-		class="add-log-button"
-		onclick={() => (isOpen = true)}
-	>
-		{#if isLogging}
-			<IconArrowRight size={14} stroke={2.5} aria-hidden="true" />
-			Resume logging
-		{:else}
-			<IconPlus size={14} stroke={2.5} aria-hidden="true" />
-			Log sets
-		{/if}
-	</Button>
+	{#if !log}
+		<Button
+			variant="secondary-ghost"
+			size="big"
+			class="add-log-button"
+			onclick={() => (isOpen = true)}
+		>
+			{#if isLogging}
+				<IconArrowRight size={14} stroke={2.5} aria-hidden="true" />
+				Resume log
+			{:else}
+				<IconPlus size={14} stroke={2.5} aria-hidden="true" />
+				Add log
+			{/if}
+		</Button>
+	{/if}
 	<FormModal
 		bind:isOpen
-		title="Log sets"
+		title={log ? 'Edit log' : 'Add log'}
 		onSubmit={() => {
-			createLogMutation.mutate({
-				programId,
-				routineId,
-				exerciseId,
-				sets: sets.map((s) => {
-					invariant(s.weight !== null && s.reps !== null, 'Set must have weight and reps');
-					return { weight: s.weight, reps: s.reps };
-				}),
-				...(note.trim() ? { note: note.trim() } : {})
+			const mappedSets = sets.map((s) => {
+				invariant(s.weight !== null && s.reps !== null, 'Set must have weight and reps');
+				return { weight: s.weight, reps: s.reps };
 			});
+			const noteValue = note.trim() ? note.trim() : undefined;
+			if (log) {
+				updateLogMutation.mutate({
+					programId,
+					routineId,
+					exerciseId,
+					id: log.id,
+					createdAt: log.createdAt,
+					sets: mappedSets,
+					note: noteValue
+				});
+			} else {
+				createLogMutation.mutate({
+					programId,
+					routineId,
+					exerciseId,
+					sets: mappedSets,
+					...(noteValue ? { note: noteValue } : {})
+				});
+			}
 		}}
-		isLoading={createLogMutation.isPending}
-		isSubmitDisabled={createLogMutation.isPending || areFieldsInvalid}
+		onClose={() => {
+			if (log) resetForm();
+		}}
+		isLoading={isPending}
+		isSubmitDisabled={isPending || areFieldsInvalid}
 		hasNoBackdrop
 	>
 		{#snippet closeIcon()}
@@ -112,7 +159,11 @@
 		<Input type="text" placeholder="Note" bind:value={note} name="note" class="note-input" />
 		<div class="set-log-rows">
 			{#each sets as set, index (set.id)}
-				<div in:listItemSlideIn out:listItemSlideOut class="set-log-row">
+				<div
+					in:listItemSlideIn={{ duration: shouldSkipAnimation ? 0 : 250 }}
+					out:listItemSlideOut
+					class="set-log-row"
+				>
 					<div class="set-log-number">
 						{index + 1}
 					</div>

@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, setDoc } from 'firebase/firestore';
+import { collection, deleteDoc, deleteField, doc, setDoc, updateDoc } from 'firebase/firestore';
 
 import { requireCurrentUser } from '$lib/features/auth';
 import { db } from '$lib/firebase';
@@ -47,12 +47,46 @@ export async function createLog(payload: CreateLogPayload) {
 	} satisfies Log as Log;
 }
 
+type UpdateLogPayload = {
+	programId: Program['id'];
+	routineId: Routine['id'];
+	exerciseId: Exercise['id'];
+	id: Log['id'];
+	createdAt: Log['createdAt'];
+	sets: Log['sets'];
+	note?: string;
+};
+
+export async function updateLog(payload: UpdateLogPayload) {
+	const user = requireCurrentUser();
+	const { programId, routineId, exerciseId, id: logId, createdAt, sets, note } = payload;
+
+	const logRef = doc(
+		db,
+		'users',
+		user.uid,
+		'programs',
+		programId,
+		'routines',
+		routineId,
+		'exercises',
+		exerciseId,
+		'logs',
+		logId
+	);
+
+	await updateDoc(logRef, { sets, note: note ?? deleteField() });
+
+	return { id: logId, createdAt, sets, ...(note ? { note } : {}) } satisfies Log as Log;
+}
+
 type DeleteLogPayload = {
 	programId: Program['id'];
 	routineId: Routine['id'];
 	exerciseId: Exercise['id'];
 	id: Log['id'];
 };
+
 export async function deleteLog(payload: DeleteLogPayload) {
 	const user = requireCurrentUser();
 

@@ -143,7 +143,7 @@
 			position: absolute;
 			bottom: 0;
 			left: 50%;
-			width: 110%;
+			width: calc(100% + 4rem);
 			transform: translateX(-50%);
 			border-bottom: 1px solid var(--neutral-5);
 		}
