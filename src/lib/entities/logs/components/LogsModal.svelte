@@ -288,7 +288,7 @@
 		position: absolute;
 		width: calc(100% + 4rem);
 		height: 100%;
-		inset-inline: -5%;
+		inset-inline: -2rem;
 	}
 
 	.analyze-toggle {

@@ -120,7 +120,7 @@
 
 	.exercise-item {
 		position: relative;
-		padding-block: 2.4rem;
+		padding-block: 2.2rem 2.4rem;
 		display: grid;
 		grid-template-columns: 1fr auto;
 		gap: 1.2rem;
