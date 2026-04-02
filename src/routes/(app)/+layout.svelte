@@ -9,8 +9,6 @@
 	import User from '$lib/components/User.svelte';
 	import NewProgramModal from '$lib/entities/programs/components/NewProgramModal.svelte';
 	import ProgramsList from '$lib/entities/programs/components/ProgramsList.svelte';
-	import Notifier from '$lib/features/notifier/Notifier.svelte';
-
 	let { children, data } = $props();
 
 	let windowInnerWidth = $state(window.innerWidth);
@@ -31,11 +29,7 @@
 
 	onNavigate(() => {
 		return () => {
-			if (!isLargeScreen) isSidebarOpen = false;
-
-			if (isLargeScreen && page.params.routineId === undefined) {
-				isSidebarOpen = false;
-			}
+			isSidebarOpen = isLargeScreen;
 		};
 	});
 </script>
@@ -43,49 +37,47 @@
 <svelte:window bind:innerWidth={windowInnerWidth} />
 
 <QueryClientProvider client={data.queryClient}>
-	<Notifier>
+	<div
+		class="app-container"
+		{@attach swipeLeft(() => (isSidebarOpen = false))}
+		{@attach swipeRight(() => (isSidebarOpen = true))}
+	>
+		<Sidebar bind:isOpen={isSidebarOpen}>
+			{#snippet top()}
+				<NewProgramModal />
+			{/snippet}
+			{#snippet center()}
+				<ProgramsList />
+			{/snippet}
+			{#snippet bottom()}
+				<User user={data.currentUser} />
+			{/snippet}
+		</Sidebar>
+		<header id="app-header">
+			<!-- This is a portal element -->
+		</header>
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
-			class="app-container"
-			{@attach swipeLeft(() => (isSidebarOpen = false))}
-			{@attach swipeRight(() => (isSidebarOpen = true))}
+			class="app-content"
+			data-sidebar-open={isSidebarOpen}
+			onclick={() => !isLargeScreen && isSidebarOpen && (isSidebarOpen = false)}
+			data-animate={shouldAnimateContent}
 		>
-			<Sidebar bind:isOpen={isSidebarOpen}>
-				{#snippet top()}
-					<NewProgramModal />
-				{/snippet}
-				{#snippet center()}
-					<ProgramsList />
-				{/snippet}
-				{#snippet bottom()}
-					<User user={data.currentUser} />
-				{/snippet}
-			</Sidebar>
-			<header id="app-header">
-				<!-- This is a portal element -->
-			</header>
-			<!-- svelte-ignore a11y_click_events_have_key_events -->
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div
-				class="app-content"
-				data-sidebar-open={isSidebarOpen}
-				onclick={() => !isLargeScreen && isSidebarOpen && (isSidebarOpen = false)}
-				data-animate={shouldAnimateContent}
-			>
-				<div class="main-wrapper" inert={isSidebarOpen && !isLargeScreen}>
-					<div id="main-top">
-						<!-- This is a portal element -->
-					</div>
-					<main>
-						<div class="main-content">
-							{#key page.url.pathname}
-								{@render children()}
-							{/key}
-						</div>
-					</main>
+			<div class="main-wrapper" inert={isSidebarOpen && !isLargeScreen}>
+				<div id="main-top">
+					<!-- This is a portal element -->
 				</div>
+				<main>
+					<div class="main-content">
+						{#key page.url.pathname}
+							{@render children()}
+						{/key}
+					</div>
+				</main>
 			</div>
 		</div>
-	</Notifier>
+	</div>
 </QueryClientProvider>
 
 <style>

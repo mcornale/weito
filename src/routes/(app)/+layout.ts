@@ -6,7 +6,7 @@ import { getCurrentUser } from '$lib/features/auth';
 export const load = async () => {
 	const currentUser = await getCurrentUser();
 
-	if (!currentUser) redirect(302, '/login');
+	if (!currentUser) redirect(302, '/get-started');
 
 	const queryClient = new QueryClient({
 		defaultOptions: {

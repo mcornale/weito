@@ -5,6 +5,7 @@
 
 	import { onNavigate } from '$app/navigation';
 	import { hideAppLoader } from '$lib/features/app-loader';
+	import Notifier from '$lib/features/notifier/Notifier.svelte';
 
 	let { children } = $props();
 
@@ -16,4 +17,6 @@
 	});
 </script>
 
-{@render children()}
+<Notifier>
+	{@render children()}
+</Notifier>
