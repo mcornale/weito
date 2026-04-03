@@ -114,7 +114,7 @@
 	<section aria-label="Features" class="features-section">
 		<div class="features-header">
 			<h2 class="features-heading">See it in action</h2>
-			<div class="features-nav">
+			<div class="features-nav" aria-hidden="true">
 				<Button
 					variant="secondary-ghost"
 					isIconOnly
@@ -147,6 +147,7 @@
 							width="750"
 							height="1000"
 							loading={i === 0 ? 'eager' : 'lazy'}
+							fetchpriority={i === 0 ? 'high' : 'auto'}
 						/>
 					</div>
 				</div>
