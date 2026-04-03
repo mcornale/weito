@@ -18,34 +18,32 @@
 
 	const features = [
 		{
-			title: 'Structure your program.',
-			description: 'Set up exercises, sets, and rest times — structured exactly the way you want.',
+			title: 'Build your own program.',
+			description:
+				'Create routines built around how you train — exercises, sets, reps, and rest times, exactly as you need them.',
 			image: screenRoutineImage,
-			alt: 'Routine view',
-			loading: 'eager' as const
+			alt: 'Routine view'
 		},
 		{
-			title: 'Log as you train.',
-			description: 'Track each set as you go. Weight, reps, note — logged in seconds, no friction.',
+			title: 'Log every set.',
+			description:
+				'Weight, reps, notes — captured mid-workout in seconds. Keep your focus on lifting.',
 			image: screenAddLogImage,
-			alt: 'Add log view',
-			loading: 'lazy' as const
+			alt: 'Add log view'
 		},
 		{
-			title: "Everything you've done.",
+			title: 'Review past sessions.',
 			description:
-				'Every session saved and sorted. Look back at any workout, any time, in seconds.',
+				'Every session saved and ready. Check past weights before you load the bar — anytime, in seconds.',
 			image: screenLogsImage,
-			alt: 'Session history view',
-			loading: 'lazy' as const
+			alt: 'Session history view'
 		},
 		{
-			title: 'Understand your progress.',
+			title: 'Measure real progress.',
 			description:
-				'See your volume and strength trend over time, so you always know what to do next.',
+				'Analyze volume and estimated 1RM over time. Know when you\u2019re progressing or due for a deload.',
 			image: screenAnalyzeImage,
-			alt: 'Progress analytics view',
-			loading: 'lazy' as const
+			alt: 'Progress analytics view'
 		}
 	];
 
@@ -148,7 +146,7 @@
 							alt={feature.alt}
 							width="750"
 							height="1000"
-							loading={feature.loading}
+							loading={i === 0 ? 'eager' : 'lazy'}
 						/>
 					</div>
 				</div>
@@ -193,9 +191,9 @@
 	}
 
 	.hero-description {
-		font-size: 1.6rem;
+		font-size: 1.7rem;
 		color: var(--neutral-10);
-		text-wrap: balance;
+		text-wrap: pretty;
 
 		@media (width >= 576px) {
 			font-size: 1.8rem;
