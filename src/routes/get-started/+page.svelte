@@ -49,33 +49,39 @@
 		}
 	];
 
-	let isFeaturesScrollElAtStart = $state(true);
-	let isFeaturesScrollElAtEnd = $state(false);
-	let featuresScrollEl: HTMLElement;
+	let isFeaturesScrollAtStart = $state(true);
+	let isFeaturesScrollAtEnd = $state(false);
+	let featuresScroll: HTMLElement;
+	let featureCards: HTMLElement[] = [];
 
 	onMount(() => {
 		function calculateCarouselPosition(e?: Event) {
-			const el = e ? (e.target as HTMLElement) : featuresScrollEl;
+			const el = e ? (e.target as HTMLElement) : featuresScroll;
 
-			isFeaturesScrollElAtStart = Math.floor(el.scrollLeft) <= 0;
-			isFeaturesScrollElAtEnd = Math.ceil(el.scrollLeft + el.clientWidth) >= el.scrollWidth;
+			isFeaturesScrollAtStart = Math.floor(el.scrollLeft) <= 0;
+			isFeaturesScrollAtEnd = Math.ceil(el.scrollLeft + el.clientWidth) >= el.scrollWidth;
 		}
 
 		calculateCarouselPosition();
-		featuresScrollEl.addEventListener('scrollend', calculateCarouselPosition);
+		featuresScroll.addEventListener('scrollend', calculateCarouselPosition);
 
 		return () => {
-			featuresScrollEl.removeEventListener('scrollend', calculateCarouselPosition);
+			featuresScroll.removeEventListener('scrollend', calculateCarouselPosition);
 		};
 	});
 
 	function scrollFeatures(direction: 'left' | 'right') {
-		const cardSize = featuresScrollEl.offsetWidth / features.length;
+		const scrollPadding = parseFloat(getComputedStyle(featuresScroll).paddingInlineStart);
+		const snapPositions = featureCards.map((card) => card.offsetLeft - scrollPadding);
 
-		featuresScrollEl.scrollBy({
-			left: cardSize * (direction === 'left' ? 1 : -1),
-			behavior: 'smooth'
-		});
+		let currentIndex = snapPositions.findLastIndex(
+			(position) => position <= featuresScroll.scrollLeft + 1
+		);
+
+		const delta = direction === 'left' ? 1 : -1;
+		const targetIndex = currentIndex + delta;
+
+		featuresScroll.scrollTo({ left: snapPositions[targetIndex], behavior: 'smooth' });
 	}
 
 	async function handleSignIn() {
@@ -114,24 +120,24 @@
 				<Button
 					variant="secondary-ghost"
 					isIconOnly
-					disabled={isFeaturesScrollElAtStart}
+					disabled={isFeaturesScrollAtStart}
 					onclick={() => scrollFeatures('right')}
 				>
-					<IconChevronLeft size={28} aria-hidden="true" />
+					<IconChevronLeft size={24} aria-hidden="true" />
 				</Button>
 				<Button
 					variant="secondary-ghost"
 					isIconOnly
-					disabled={isFeaturesScrollElAtEnd}
+					disabled={isFeaturesScrollAtEnd}
 					onclick={() => scrollFeatures('left')}
 				>
-					<IconChevronRight size={28} aria-hidden="true" />
+					<IconChevronRight size={24} aria-hidden="true" />
 				</Button>
 			</div>
 		</div>
-		<div class="features-scroll" bind:this={featuresScrollEl}>
+		<div class="features-scroll" bind:this={featuresScroll}>
 			{#each features as feature, i (i)}
-				<div class="feature-card">
+				<div class="feature-card" bind:this={featureCards[i]}>
 					<div class="feature-text">
 						<h2>{feature.title}</h2>
 						<p>{feature.description}</p>
@@ -207,28 +213,28 @@
 	}
 
 	.features-header {
+		display: flex;
 		padding-inline: var(--page-padding);
 		justify-content: space-between;
 		align-items: center;
 		margin-block-end: 1rem;
-
-		display: none;
-
-		@media (width >= 450px) {
-			display: flex;
-		}
 	}
 
 	.features-heading {
-		font-size: 1.8rem;
+		font-size: 1.6rem;
 		font-weight: 700;
-		letter-spacing: -0.03em;
+		letter-spacing: -0.02em;
 		color: var(--neutral-10);
 		text-transform: uppercase;
+
+		@media (width >= 576px) {
+			font-size: 1.8rem;
+		}
 	}
 
 	.features-nav {
 		display: flex;
+		margin-inline-end: -1rem;
 	}
 
 	.features-scroll {
@@ -240,11 +246,7 @@
 		padding-inline: var(--page-padding);
 		padding-block-end: 1.2rem;
 		scrollbar-width: none;
-		flex-direction: column;
-
-		@media (width >= 450px) {
-			flex-direction: row;
-		}
+		flex-direction: row;
 	}
 
 	.feature-card {
