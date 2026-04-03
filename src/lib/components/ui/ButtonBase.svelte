@@ -60,6 +60,7 @@
 		user-select: none;
 		font-weight: 600;
 		overflow: hidden;
+		transition: opacity 0.2s var(--ease-quad-out);
 
 		&[data-variant='primary'] {
 			background-color: var(--neutral-12);

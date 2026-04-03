@@ -3,8 +3,8 @@
 	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 	import invariant from 'tiny-invariant';
 
-	import Button from '$lib/components/ui/Button.svelte';
 	import Menu from '$lib/components/ui/Menu.svelte';
+	import MenuItem from '$lib/components/ui/MenuItem.svelte';
 	import { swapExerciseOrder } from '$lib/entities/exercises/mutations';
 	import { getExercisesQueryOptions } from '$lib/entities/exercises/queries';
 	import type { Program } from '$lib/entities/programs/types';
@@ -87,22 +87,22 @@
 </script>
 
 <Menu bind:this={menu}>
-	<Button variant="secondary-ghost" onclick={() => (isEditExerciseModalOpen = true)}>
+	<MenuItem onSelect={() => (isEditExerciseModalOpen = true)}>
 		<IconPencil size={16} stroke={2.5} aria-hidden="true" />
 		Edit
-	</Button>
-	<Button variant="secondary-ghost" disabled={!canMoveUp} onclick={() => move(-1)}>
+	</MenuItem>
+	<MenuItem isDisabled={!canMoveUp} onSelect={() => move(-1)}>
 		<IconArrowUp size={16} stroke={2.5} aria-hidden="true" />
 		Move up
-	</Button>
-	<Button variant="secondary-ghost" disabled={!canMoveDown} onclick={() => move(1)}>
+	</MenuItem>
+	<MenuItem isDisabled={!canMoveDown} onSelect={() => move(1)}>
 		<IconArrowDown size={16} stroke={2.5} aria-hidden="true" />
 		Move down
-	</Button>
-	<Button variant="tertiary-destructive" onclick={() => (isRemoveExerciseModalOpen = true)}>
+	</MenuItem>
+	<MenuItem variant="destructive" onSelect={() => (isRemoveExerciseModalOpen = true)}>
 		<IconTrash size={16} stroke={2.5} aria-hidden="true" />
 		Remove
-	</Button>
+	</MenuItem>
 </Menu>
 
 <EditExerciseModal bind:isOpen={isEditExerciseModalOpen} {exercise} {programId} {routineId} />

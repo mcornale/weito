@@ -41,13 +41,13 @@
 
 	.toggle-control {
 		background-color: var(--neutral-8);
-		--padding: 0.2rem;
-		--inner-size: 1.8rem;
-		--height: calc(var(--inner-size) + calc(var(--padding) * 2));
-		height: var(--height);
-		width: calc(var(--inner-size) * 2 + var(--padding) * 2);
-		padding: var(--padding);
-		border-radius: calc(var(--height) / 2);
+		--track-padding: 0.2rem;
+		--thumb-size: 1.8rem;
+		--track-height: calc(var(--thumb-size) + calc(var(--track-padding) * 2));
+		height: var(--track-height);
+		width: calc(var(--thumb-size) * 2 + var(--track-padding) * 2);
+		padding: var(--track-padding);
+		border-radius: calc(var(--track-height) / 2);
 		display: flex;
 		align-items: center;
 		transform: scale(1);
@@ -71,11 +71,10 @@
 	.toggle-inner {
 		color: var(--neutral-9);
 		background-color: var(--neutral-1);
-		height: var(--inner-size);
-		--inner-width-multiplier: 1.5;
-		--inner-width: calc(var(--inner-size) * var(--inner-width-multiplier));
-		width: var(--inner-width);
-		border-radius: calc(var(--inner-size) / 2);
+		height: var(--thumb-size);
+		--thumb-width: calc(var(--thumb-size) * 1.5);
+		width: var(--thumb-width);
+		border-radius: calc(var(--thumb-size) / 2);
 		display: grid;
 		place-items: center;
 		transition: transform 0.2s var(--ease-quad-out);
@@ -83,6 +82,6 @@
 
 	.toggle:has(input:checked) .toggle-inner {
 		color: var(--neutral-12);
-		transform: translateX(calc(var(--inner-size) * 2 - var(--inner-width)));
+		transform: translateX(calc(var(--thumb-size) * 2 - var(--thumb-width)));
 	}
 </style>

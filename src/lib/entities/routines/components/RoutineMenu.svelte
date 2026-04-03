@@ -3,8 +3,8 @@
 	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 	import invariant from 'tiny-invariant';
 
-	import Button from '$lib/components/ui/Button.svelte';
 	import Menu from '$lib/components/ui/Menu.svelte';
+	import MenuItem from '$lib/components/ui/MenuItem.svelte';
 	import { getProgramsQueryOptions } from '$lib/entities/programs/queries';
 	import type { Program } from '$lib/entities/programs/types';
 	import { swapRoutineOrder } from '$lib/entities/routines/mutations';
@@ -86,18 +86,18 @@
 </script>
 
 <Menu bind:this={menu}>
-	<Button variant="secondary-ghost" onclick={() => (isRenameRoutineModalOpen = true)}>
+	<MenuItem onSelect={() => (isRenameRoutineModalOpen = true)}>
 		<IconPencil size={16} stroke={2.5} aria-hidden="true" />
 		Rename
-	</Button>
-	<Button variant="secondary-ghost" disabled={!canMoveUp} onclick={() => move(-1)}>
+	</MenuItem>
+	<MenuItem isDisabled={!canMoveUp} onSelect={() => move(-1)}>
 		<IconArrowUp size={16} stroke={2.5} aria-hidden="true" />
 		Move up
-	</Button>
-	<Button variant="secondary-ghost" disabled={!canMoveDown} onclick={() => move(1)}>
+	</MenuItem>
+	<MenuItem isDisabled={!canMoveDown} onSelect={() => move(1)}>
 		<IconArrowDown size={16} stroke={2.5} aria-hidden="true" />
 		Move down
-	</Button>
+	</MenuItem>
 	<!-- <Button variant="secondary-ghost" disabled>
 		<IconCopy size={16} stroke={2.5} aria-hidden="true" />
 		Copy exercises

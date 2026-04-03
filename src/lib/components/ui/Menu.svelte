@@ -11,27 +11,87 @@
 
 	let { children }: Props = $props();
 
-	let dialogId = $props.id();
-	let dialog = $state<HTMLDialogElement | undefined>(undefined);
+	let menuId = $props.id();
+	let menu = $state<HTMLDivElement | undefined>(undefined);
+	let isOpen = $state(false);
 
 	export function close() {
-		invariant(dialog, 'Dialog should be defined');
-		dialog.hidePopover();
+		invariant(menu, 'Menu should be defined');
+		menu.hidePopover();
+	}
+
+	function getItems() {
+		invariant(menu, 'Menu should be defined');
+		return Array.from(menu.querySelectorAll<HTMLButtonElement>('[role="menuitem"]'));
 	}
 </script>
 
-<Button variant="secondary-ghost" isIconOnly popovertarget={dialogId} popovertargetaction="toggle">
+<Button
+	variant="secondary-ghost"
+	isIconOnly
+	popovertarget={menuId}
+	popovertargetaction="toggle"
+	aria-haspopup="menu"
+	aria-expanded={isOpen}
+>
 	<IconDots size={16} aria-hidden="true" />
 	<span class="sr-only">Open menu</span>
 </Button>
-<dialog bind:this={dialog} popover="auto" id={dialogId}>
+<div
+	bind:this={menu}
+	popover="auto"
+	id={menuId}
+	role="menu"
+	tabindex="-1"
+	ontoggle={(e) => {
+		isOpen = e.newState === 'open';
+		if (e.newState === 'open') {
+			setTimeout(() => {
+				const first = getItems().find((el) => el.getAttribute('disabled') !== 'true');
+				invariant(first, 'Menu should have at least one enabled MenuItem');
+				first.focus();
+			});
+		}
+	}}
+	onkeydown={(e) => {
+		if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+			e.preventDefault();
+		}
+
+		if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+			e.preventDefault();
+			const items = getItems();
+			console.log(items);
+			const current = items.indexOf(document.activeElement as HTMLButtonElement);
+			const step = e.key === 'ArrowDown' ? 1 : -1;
+			let next = (current + step + items.length) % items.length;
+
+			while (items[next].disabled && next !== current) {
+				next = (next + step + items.length) % items.length;
+			}
+			items[next].focus();
+		}
+
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			const focused = document.activeElement as HTMLButtonElement;
+			if (focused?.getAttribute('role') === 'menuitem' && !focused.disabled) {
+				focused.click();
+			}
+		}
+
+		if (e.key === 'Tab') {
+			close();
+		}
+	}}
+>
 	<div class="content">
 		{@render children()}
 	</div>
-</dialog>
+</div>
 
 <style>
-	dialog[popover] {
+	div[popover] {
 		border: none;
 		background-color: var(--neutral-1);
 		border-radius: 1.2rem;
@@ -58,7 +118,7 @@
 		}
 	}
 
-	dialog[popover] .content {
+	div[popover] .content {
 		display: flex;
 		flex-direction: column;
 	}

@@ -2,8 +2,8 @@
 	import { IconPencil, IconStack2, IconTrash } from '@tabler/icons-svelte';
 	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 
-	import Button from '$lib/components/ui/Button.svelte';
 	import Menu from '$lib/components/ui/Menu.svelte';
+	import MenuItem from '$lib/components/ui/MenuItem.svelte';
 	import { duplicateProgram } from '$lib/entities/programs/mutations';
 	import { getProgramsQueryOptions } from '$lib/entities/programs/queries';
 	import { getNotifierContext } from '$lib/features/notifier/context';
@@ -48,28 +48,26 @@
 </script>
 
 <Menu bind:this={menu}>
-	<Button variant="secondary-ghost" onclick={() => (isRenameProgramModalOpen = true)}>
+	<MenuItem onSelect={() => (isRenameProgramModalOpen = true)}>
 		<IconPencil size={16} stroke={2.5} aria-hidden="true" />
 		Rename
-	</Button>
-	<Button
-		variant="secondary-ghost"
+	</MenuItem>
+	<MenuItem
 		isLoading={duplicateProgramMutation.isPending}
-		onclick={() => {
+		onSelect={() => {
 			const programsQueryKey = getProgramsQueryOptions().queryKey;
 			const existingNames = (queryClient.getQueryData(programsQueryKey) ?? []).map((p) => p.name);
 			const name = getNextDuplicateName(program.name, existingNames);
 			duplicateProgramMutation.mutate({ id: program.id, name });
 		}}
-		disabled={duplicateProgramMutation.isPending}
 	>
 		<IconStack2 size={16} stroke={2.5} aria-hidden="true" />
 		Duplicate
-	</Button>
-	<Button variant="tertiary-destructive" onclick={() => (isDeleteProgramModalOpen = true)}>
+	</MenuItem>
+	<MenuItem variant="destructive" onSelect={() => (isDeleteProgramModalOpen = true)}>
 		<IconTrash size={16} stroke={2.5} aria-hidden="true" />
 		Delete
-	</Button>
+	</MenuItem>
 </Menu>
 
 <RenameProgramModal bind:isOpen={isRenameProgramModalOpen} {program} />
