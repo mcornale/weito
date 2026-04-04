@@ -11,7 +11,7 @@
 	import type { Exercise } from '$lib/entities/exercises/types';
 	import { createLog, updateLog } from '$lib/entities/logs/mutations';
 	import { getLogsQueryOptions } from '$lib/entities/logs/queries';
-	import type { Log, LogSet } from '$lib/entities/logs/types';
+	import type { Log, LogSet } from '$lib/entities/logs/schema';
 	import type { Program } from '$lib/entities/programs/types';
 	import type { Routine } from '$lib/entities/routines/types';
 	import { getNotifierContext } from '$lib/features/notifier/context';
@@ -27,13 +27,11 @@
 
 	let { programId, routineId, exerciseId, log, isOpen = $bindable(false) }: Props = $props();
 
-	type SetState = {
+	type Set = Partial<LogSet> & {
 		id: number;
-		weight: LogSet['weight'] | null;
-		reps: LogSet['reps'] | null;
 	};
 
-	let sets = $state<SetState[]>([]);
+	let sets = $state<Set[]>([]);
 	let nextSetId = $state(0);
 	let note = $state('');
 	let shouldSkipAnimation = $state(false);
@@ -53,11 +51,6 @@
 			tick().then(() => (shouldSkipAnimation = false));
 		}
 	});
-
-	async function addSet() {
-		sets = [...sets, { id: nextSetId++, weight: null, reps: null }];
-		await tick();
-	}
 
 	const queryClient = useQueryClient();
 
@@ -203,7 +196,15 @@
 				</div>
 			{/each}
 		</div>
-		<Button variant="secondary-ghost" size="big" onclick={addSet} class="add-set-button" autofocus>
+		<Button
+			variant="secondary-ghost"
+			size="big"
+			onclick={() => {
+				sets = [...sets, { id: nextSetId++, weight: undefined, reps: undefined }];
+			}}
+			class="add-set-button"
+			autofocus
+		>
 			<IconPlus size={14} stroke={2.5} aria-hidden="true" />
 			Add set
 		</Button>

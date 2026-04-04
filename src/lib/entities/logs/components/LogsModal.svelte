@@ -8,7 +8,7 @@
 	import ExerciseItem from '$lib/entities/exercises/components/ExerciseItem.svelte';
 	import type { Exercise } from '$lib/entities/exercises/types';
 	import { getLogsQueryOptions } from '$lib/entities/logs/queries';
-	import type { Log } from '$lib/entities/logs/types';
+	import type { Log } from '$lib/entities/logs/schema';
 	import type { Program } from '$lib/entities/programs/types';
 	import type { Routine } from '$lib/entities/routines/types';
 	import { capitalize, isToday } from '$lib/utils';
