@@ -12,8 +12,8 @@
 	import { createLog, updateLog } from '$lib/entities/logs/mutations';
 	import { getLogsQueryOptions } from '$lib/entities/logs/queries';
 	import type { Log, LogSet } from '$lib/entities/logs/schema';
-	import type { Program } from '$lib/entities/programs/types';
-	import type { Routine } from '$lib/entities/routines/types';
+	import type { Program } from '$lib/entities/programs/schema';
+	import type { Routine } from '$lib/entities/routines/schema';
 	import { getNotifierContext } from '$lib/features/notifier/context';
 	import { listItemSlideIn, listItemSlideOut } from '$lib/transitions';
 

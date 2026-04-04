@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 
-import type { Program } from './types';
+import type { Routine } from '../routines/schema';
 
 /** Schema for a program document as stored in Firestore (without routines). */
 export const ProgramDocSchema = v.object({
@@ -9,6 +9,12 @@ export const ProgramDocSchema = v.object({
 	createdAt: v.string()
 });
 
-export function parseProgramDoc(data: unknown): Omit<Program, 'routines'> {
+type ProgramDocSchema = v.InferInput<typeof ProgramDocSchema>;
+
+export function parseProgramDoc(data: unknown): ProgramDocSchema {
 	return v.parse(ProgramDocSchema, data);
 }
+
+export type Program = ProgramDocSchema & {
+	routines: Routine[];
+};

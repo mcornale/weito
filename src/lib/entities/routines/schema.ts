@@ -1,7 +1,5 @@
 import * as v from 'valibot';
 
-import type { Routine } from './types';
-
 export const RoutineSchema = v.object({
 	id: v.string(),
 	order: v.number(),
@@ -9,6 +7,8 @@ export const RoutineSchema = v.object({
 	createdAt: v.string(),
 	programId: v.string()
 });
+
+export type Routine = v.InferInput<typeof RoutineSchema>;
 
 export function parseRoutine(data: unknown): Routine {
 	return v.parse(RoutineSchema, data);

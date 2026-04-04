@@ -9,8 +9,8 @@
 	import type { Exercise } from '$lib/entities/exercises/schema';
 	import { getLogsQueryOptions } from '$lib/entities/logs/queries';
 	import type { Log } from '$lib/entities/logs/schema';
-	import type { Program } from '$lib/entities/programs/types';
-	import type { Routine } from '$lib/entities/routines/types';
+	import type { Program } from '$lib/entities/programs/schema';
+	import type { Routine } from '$lib/entities/routines/schema';
 	import { capitalize, isToday } from '$lib/utils';
 
 	import LogSetsModal from './LogSetsModal.svelte';
