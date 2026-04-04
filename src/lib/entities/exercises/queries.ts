@@ -4,8 +4,8 @@ import { collection, getDocs } from 'firebase/firestore';
 import { requireCurrentUser } from '$lib/features/auth';
 import { db } from '$lib/firebase';
 
-import type { Program } from '../programs/types';
-import type { Routine } from '../routines/types';
+import type { Program } from '../programs/schema';
+import type { Routine } from '../routines/schema';
 import { parseExercise } from './schema';
 
 export async function getExercises(programId: Program['id'], routineId: Routine['id']) {

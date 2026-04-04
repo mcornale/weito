@@ -3,7 +3,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { requireCurrentUser } from '$lib/features/auth';
 import { db } from '$lib/firebase';
 
-import type { Program } from '../programs/types';
+import type { Program } from '../programs/schema';
 import { parseRoutine } from './schema';
 
 export async function getRoutines(programId: Program['id']) {
