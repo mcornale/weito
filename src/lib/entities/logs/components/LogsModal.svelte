@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { IconArrowLeft, IconPencil } from '@tabler/icons-svelte';
 	import { createQuery } from '@tanstack/svelte-query';
-	import invariant from 'tiny-invariant';
 
 	import Button from '$lib/components/ui/Button.svelte';
 	import Modal from '$lib/components/ui/Modal.svelte';
@@ -12,7 +11,7 @@
 	import type { Log } from '$lib/entities/logs/types';
 	import type { Program } from '$lib/entities/programs/types';
 	import type { Routine } from '$lib/entities/routines/types';
-	import { capitalize } from '$lib/utils';
+	import { capitalize, isToday } from '$lib/utils';
 
 	import LogSetsModal from './LogSetsModal.svelte';
 	import OneRMChart from './OneRMChart.svelte';
@@ -30,13 +29,6 @@
 	let isAnalyzeMode = $state(false);
 	let editingLog = $state<Log | null>(null);
 	let isEditModalOpen = $state(false);
-
-	function isSameDate(...dates: string[]) {
-		invariant(dates.length >= 2, 'At least two dates are required');
-		return dates.every(
-			(date) => new Date(date).toLocaleDateString() === new Date(dates[0]).toLocaleDateString()
-		);
-	}
 
 	function formatRelativeDate(date: string) {
 		const formatter = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
@@ -105,7 +97,7 @@
 			</div>
 		{:else}
 			<div class="section-list">
-				{#if logs.length === 0 || !logs.some( (log) => isSameDate(log.createdAt, new Date().toISOString()) )}
+				{#if logs.length === 0 || !logs.some((log) => isToday(log.createdAt))}
 					<div class="section section-with-button">
 						<p class="section-title">
 							{capitalize(formatRelativeDate(new Date().toISOString()))}

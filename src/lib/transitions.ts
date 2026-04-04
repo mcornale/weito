@@ -4,6 +4,7 @@ import type { TransitionConfig } from 'svelte/transition';
 type CreateListItemSlideTransition = (
 	type: 'in' | 'out'
 ) => (node: Element, options?: { duration?: number }) => TransitionConfig;
+
 const createListItemSlideTransition: CreateListItemSlideTransition =
 	(type) =>
 	(node, { duration = 250 } = {}) => {
