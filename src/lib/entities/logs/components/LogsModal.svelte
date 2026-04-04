@@ -13,7 +13,8 @@
 	import type { Routine } from '$lib/entities/routines/schema';
 	import { capitalize, isToday } from '$lib/utils';
 
-	import LogSetsModal from './LogSetsModal.svelte';
+	import AddLogModal from './AddLogModal.svelte';
+	import EditLogModal from './EditLogModal.svelte';
 	import OneRMChart from './OneRMChart.svelte';
 	import VolumeChart from './VolumeChart.svelte';
 
@@ -102,7 +103,7 @@
 						<p class="section-title">
 							{capitalize(formatRelativeDate(new Date().toISOString()))}
 						</p>
-						<LogSetsModal {programId} {routineId} exerciseId={exercise.id} />
+						<AddLogModal {programId} {routineId} exerciseId={exercise.id} />
 					</div>
 				{/if}
 				{#each logs as log (log.id)}
@@ -150,7 +151,7 @@
 		{/if}
 	</Modal>
 	{#if editingLog}
-		<LogSetsModal
+		<EditLogModal
 			{programId}
 			{routineId}
 			exerciseId={exercise.id}
