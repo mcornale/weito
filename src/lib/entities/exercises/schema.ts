@@ -1,7 +1,5 @@
 import * as v from 'valibot';
 
-import type { Exercise } from './types';
-
 export const ExerciseSchema = v.object({
 	id: v.string(),
 	order: v.number(),
@@ -10,6 +8,8 @@ export const ExerciseSchema = v.object({
 	restTime: v.object({ minutes: v.number(), seconds: v.number() }),
 	createdAt: v.string()
 });
+
+export type Exercise = v.InferInput<typeof ExerciseSchema>;
 
 export function parseExercise(data: unknown): Exercise {
 	return v.parse(ExerciseSchema, data);

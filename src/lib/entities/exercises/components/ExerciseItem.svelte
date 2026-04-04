@@ -3,7 +3,7 @@
 	import { createQuery } from '@tanstack/svelte-query';
 	import { scale } from 'svelte/transition';
 
-	import type { Exercise } from '$lib/entities/exercises/types';
+	import type { Exercise } from '$lib/entities/exercises/schema';
 	import { getLogsQueryOptions } from '$lib/entities/logs/queries';
 	import type { Program } from '$lib/entities/programs/types';
 	import type { Routine } from '$lib/entities/routines/types';

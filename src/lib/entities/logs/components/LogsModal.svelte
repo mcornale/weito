@@ -6,7 +6,7 @@
 	import Modal from '$lib/components/ui/Modal.svelte';
 	import Toggle from '$lib/components/ui/Toggle.svelte';
 	import ExerciseItem from '$lib/entities/exercises/components/ExerciseItem.svelte';
-	import type { Exercise } from '$lib/entities/exercises/types';
+	import type { Exercise } from '$lib/entities/exercises/schema';
 	import { getLogsQueryOptions } from '$lib/entities/logs/queries';
 	import type { Log } from '$lib/entities/logs/schema';
 	import type { Program } from '$lib/entities/programs/types';

@@ -8,7 +8,7 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
 	import InputLabel from '$lib/components/ui/InputLabel.svelte';
-	import type { Exercise } from '$lib/entities/exercises/types';
+	import type { Exercise } from '$lib/entities/exercises/schema';
 	import { createLog, updateLog } from '$lib/entities/logs/mutations';
 	import { getLogsQueryOptions } from '$lib/entities/logs/queries';
 	import type { Log, LogSet } from '$lib/entities/logs/schema';
