@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Log } from '$lib/entities/logs/types';
+	import type { Log } from '$lib/entities/logs/schema';
 
 	type Props = {
 		logs: Log[];

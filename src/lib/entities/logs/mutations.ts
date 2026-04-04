@@ -3,10 +3,10 @@ import { collection, deleteDoc, deleteField, doc, setDoc, updateDoc } from 'fire
 import { requireCurrentUser } from '$lib/features/auth';
 import { db } from '$lib/firebase';
 
-import type { Exercise } from '../exercises/types';
-import type { Program } from '../programs/types';
-import type { Routine } from '../routines/types';
-import type { Log } from './types';
+import type { Exercise } from '../exercises/schema';
+import type { Program } from '../programs/schema';
+import type { Routine } from '../routines/schema';
+import type { Log } from './schema';
 
 type CreateLogPayload = Omit<Log, 'id' | 'createdAt'> & {
 	programId: Program['id'];

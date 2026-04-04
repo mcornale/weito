@@ -3,7 +3,7 @@ import { collection, doc, setDoc, writeBatch } from 'firebase/firestore';
 import { requireCurrentUser } from '$lib/features/auth';
 import { db } from '$lib/firebase';
 
-import type { Routine } from './types';
+import type { Routine } from './schema';
 
 export type UpdateRoutinePayload = Pick<Routine, 'id' | 'programId'> &
 	Partial<Omit<Routine, 'id' | 'programId' | 'createdAt'>>;

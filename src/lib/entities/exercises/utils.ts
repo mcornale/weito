@@ -1,4 +1,4 @@
-import type { Exercise } from './types';
+import type { Exercise } from './schema';
 
 export function formatSetsAndReps(setsAndReps: Exercise['setsAndReps']): string {
 	if (setsAndReps.length > 1 && setsAndReps.every((set) => set.sets === 1))

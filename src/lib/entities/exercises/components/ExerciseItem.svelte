@@ -5,8 +5,8 @@
 
 	import type { Exercise } from '$lib/entities/exercises/schema';
 	import { getLogsQueryOptions } from '$lib/entities/logs/queries';
-	import type { Program } from '$lib/entities/programs/types';
-	import type { Routine } from '$lib/entities/routines/types';
+	import type { Program } from '$lib/entities/programs/schema';
+	import type { Routine } from '$lib/entities/routines/schema';
 
 	import { formatSetsAndReps } from '../utils';
 

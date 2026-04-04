@@ -6,7 +6,7 @@
 
 	import { updateExercise } from '../mutations';
 	import { getExercisesQueryOptions } from '../queries';
-	import type { Exercise } from '../types';
+	import type { Exercise } from '../schema';
 	import ExerciseModal from './ExerciseModal.svelte';
 
 	type Props = {

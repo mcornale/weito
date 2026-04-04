@@ -5,8 +5,8 @@ import { db, deleteCollectionInBatches } from '$lib/firebase';
 
 import { getExercises } from '../exercises/queries';
 import { getRoutines } from '../routines/queries';
-import type { Routine } from '../routines/types';
-import type { Program } from './types';
+import type { Routine } from '../routines/schema';
+import type { Program } from './schema';
 
 type CreateProgramPayload = Pick<Program, 'name'> & {
 	routineNames: Routine['name'][];

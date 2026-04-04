@@ -5,9 +5,9 @@ import { requireCurrentUser } from '$lib/features/auth';
 import { db } from '$lib/firebase';
 
 import { getRoutines } from '../routines/queries';
-import type { Routine } from '../routines/types';
+import type { Routine } from '../routines/schema';
+import type { Program } from './schema';
 import { parseProgramDoc } from './schema';
-import type { Program } from './types';
 
 export async function getPrograms(): Promise<Program[]> {
 	const user = requireCurrentUser();

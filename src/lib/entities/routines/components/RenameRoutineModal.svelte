@@ -6,7 +6,7 @@
 	import Input from '$lib/components/ui/Input.svelte';
 	import { getProgramsQueryOptions } from '$lib/entities/programs/queries';
 	import { updateRoutine } from '$lib/entities/routines/mutations';
-	import type { Routine } from '$lib/entities/routines/types';
+	import type { Routine } from '$lib/entities/routines/schema';
 	import { getNotifierContext } from '$lib/features/notifier/context';
 
 	type Props = {

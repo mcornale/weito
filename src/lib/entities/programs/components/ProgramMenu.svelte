@@ -8,7 +8,7 @@
 	import { getProgramsQueryOptions } from '$lib/entities/programs/queries';
 	import { getNotifierContext } from '$lib/features/notifier/context';
 
-	import type { Program } from '../types';
+	import type { Program } from '../schema';
 	import DeleteProgramModal from './DeleteProgramModal.svelte';
 	import RenameProgramModal from './RenameProgramModal.svelte';
 

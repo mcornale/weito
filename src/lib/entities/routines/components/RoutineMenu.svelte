@@ -6,11 +6,11 @@
 	import Menu from '$lib/components/ui/Menu.svelte';
 	import MenuItem from '$lib/components/ui/MenuItem.svelte';
 	import { getProgramsQueryOptions } from '$lib/entities/programs/queries';
-	import type { Program } from '$lib/entities/programs/types';
+	import type { Program } from '$lib/entities/programs/schema';
 	import { swapRoutineOrder } from '$lib/entities/routines/mutations';
 	import { getNotifierContext } from '$lib/features/notifier/context';
 
-	import type { Routine } from '../types';
+	import type { Routine } from '../schema';
 	import RenameRoutineModal from './RenameRoutineModal.svelte';
 
 	type Props = {

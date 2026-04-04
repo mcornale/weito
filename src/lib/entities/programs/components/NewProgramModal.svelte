@@ -12,7 +12,7 @@
 	import { getNotifierContext } from '$lib/features/notifier/context';
 	import { listItemSlideIn, listItemSlideOut } from '$lib/transitions';
 
-	import type { Program } from '../types';
+	import type { Program } from '../schema';
 
 	type RoutineState = {
 		id: number;

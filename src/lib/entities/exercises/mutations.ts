@@ -3,9 +3,9 @@ import { collection, deleteDoc, doc, setDoc, writeBatch } from 'firebase/firesto
 import { requireCurrentUser } from '$lib/features/auth';
 import { db } from '$lib/firebase';
 
-import type { Program } from '../programs/types';
-import type { Routine } from '../routines/types';
-import type { Exercise } from './types';
+import type { Program } from '../programs/schema';
+import type { Routine } from '../routines/schema';
+import type { Exercise } from './schema';
 
 type CreateExercisePayload = Omit<Exercise, 'id' | 'createdAt'> & {
 	programId: Program['id'];

@@ -5,11 +5,11 @@
 	import FormModal from '$lib/components/FormModal.svelte';
 	import { deleteExercise } from '$lib/entities/exercises/mutations';
 	import { getExercisesQueryOptions } from '$lib/entities/exercises/queries';
-	import type { Program } from '$lib/entities/programs/types';
-	import type { Routine } from '$lib/entities/routines/types';
+	import type { Program } from '$lib/entities/programs/schema';
+	import type { Routine } from '$lib/entities/routines/schema';
 	import { getNotifierContext } from '$lib/features/notifier/context';
 
-	import type { Exercise } from '../types';
+	import type { Exercise } from '../schema';
 
 	type Props = {
 		exercise: Exercise;
