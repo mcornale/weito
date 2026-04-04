@@ -25,22 +25,18 @@
 
 	let { programId, routineId, exerciseId, log, isOpen = $bindable(false) }: Props = $props();
 
-	let sets = $state<FormSet[]>([]);
-	let nextSetId = $state(0);
-	let note = $state('');
-	let shouldSkipAnimation = $state(false);
+	let sets = $derived<FormSet[]>(
+		log.sets.map((s, i) => ({ id: i, weight: s.weight, reps: s.reps }))
+	);
+	let nextSetId = $derived(log.sets.length);
+	let note = $derived(log.note ?? '');
+	let shouldSkipAnimation = $derived(false);
 
 	function resetForm() {
 		sets = [];
 		nextSetId = 0;
 		note = '';
 	}
-
-	$effect(() => {
-		sets = log.sets.map((s, i) => ({ id: i, weight: s.weight, reps: s.reps }));
-		nextSetId = log.sets.length;
-		note = log.note ?? '';
-	});
 
 	$effect(() => {
 		if (isOpen) {
@@ -69,7 +65,7 @@
 	}));
 
 	const areFieldsInvalid = $derived(
-		sets.length === 0 || sets.some((s) => s.weight === null || s.reps === null)
+		sets.length === 0 || sets.some((s) => s.weight === undefined || s.reps === undefined)
 	);
 </script>
 
@@ -78,7 +74,10 @@
 	title="Edit logged sets"
 	onSubmit={() => {
 		const mappedSets = sets.map((s) => {
-			invariant(s.weight !== null && s.reps !== null, 'Set must have weight and reps');
+			invariant(
+				s.weight !== undefined && s.reps !== undefined,
+				'All sets must have weight and reps'
+			);
 			return { weight: s.weight, reps: s.reps };
 		});
 		const noteValue = note.trim() ? note.trim() : undefined;

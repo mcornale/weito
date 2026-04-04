@@ -53,7 +53,7 @@
 	}));
 
 	const areFieldsInvalid = $derived(
-		sets.length === 0 || sets.some((s) => s.weight === null || s.reps === null)
+		sets.length === 0 || sets.some((s) => s.weight === undefined || s.reps === undefined)
 	);
 	const isLogging = $derived(sets.length > 0 || note.trim() !== '');
 </script>
@@ -78,7 +78,10 @@
 		title="Log sets"
 		onSubmit={() => {
 			const mappedSets = sets.map((s) => {
-				invariant(s.weight !== null && s.reps !== null, 'Set must have weight and reps');
+				invariant(
+					s.weight !== undefined && s.reps !== undefined,
+					'All sets must have weight and reps'
+				);
 				return { weight: s.weight, reps: s.reps };
 			});
 			const noteValue = note.trim() ? note.trim() : undefined;
