@@ -53,8 +53,8 @@
 	let featureCards: HTMLElement[] = [];
 
 	onMount(() => {
-		function calculateCarouselPosition(e?: Event) {
-			const el = e ? (e.target as HTMLElement) : featuresScroll;
+		function calculateCarouselPosition() {
+			const el = featuresScroll;
 
 			isFeaturesScrollAtStart = Math.floor(el.scrollLeft) <= 0;
 			isFeaturesScrollAtEnd = Math.ceil(el.scrollLeft + el.clientWidth) >= el.scrollWidth;

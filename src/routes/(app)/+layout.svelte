@@ -53,6 +53,7 @@
 				<User user={data.currentUser} />
 			{/snippet}
 		</Sidebar>
+
 		<header id="app-header">
 			<!-- This is a portal element -->
 		</header>
