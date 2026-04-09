@@ -148,7 +148,12 @@
 	.content {
 		padding: 2rem;
 		padding-block-start: 1.2rem;
+		padding-block-end: calc(2.8rem + env(safe-area-inset-bottom));
 		min-height: 100%;
+
+		@media (width >= 576px) {
+			padding-block-end: 2rem;
+		}
 	}
 
 	.header {
