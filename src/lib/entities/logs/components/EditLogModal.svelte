@@ -25,12 +25,10 @@
 
 	let { programId, routineId, exerciseId, log, isOpen = $bindable(false) }: Props = $props();
 
-	let sets = $derived<FormSet[]>(
-		log.sets.map((s, i) => ({ id: i, weight: s.weight, reps: s.reps }))
-	);
-	let nextSetId = $derived(log.sets.length);
-	let note = $derived(log.note ?? '');
-	let shouldSkipAnimation = $derived(false);
+	let sets = $state<FormSet[]>([]);
+	let nextSetId = $state(0);
+	let note = $state('');
+	let shouldSkipAnimation = $state(false);
 
 	function resetForm() {
 		sets = [];
@@ -40,6 +38,9 @@
 
 	$effect(() => {
 		if (isOpen) {
+			sets = log.sets.map((s, i) => ({ id: i, weight: s.weight, reps: s.reps }));
+			nextSetId = log.sets.length;
+			note = log.note ?? '';
 			shouldSkipAnimation = true;
 			tick().then(() => (shouldSkipAnimation = false));
 		}
